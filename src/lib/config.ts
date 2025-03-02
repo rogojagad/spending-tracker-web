@@ -1,0 +1,18 @@
+export const config = {
+  // API configuration
+  api: {
+    baseUrl: import.meta.env.VITE_API_BASE_URL,
+    endpoints: {
+      spendings: "spendings",
+    },
+  },
+
+  // Currency formatting
+  currency: {
+    code: "IDR", // Change this to your preferred currency
+    locale: "id-ID", // Change this to your preferred locale
+  },
+
+  // Date formatting
+  dateFormat: "DD MMM YYYY",
+};
