@@ -3,6 +3,9 @@
   import type { PageData } from "./+page";
   import "../types/number";
   import "../types/dayjs";
+  import { onMount } from "svelte";
+  import { browser } from "$app/environment";
+  import { getAllSpendings } from "$lib/spending/api";
 
   export let data: PageData;
 
@@ -12,6 +15,20 @@
   $: totalAmount = spendings.reduce((prev, next) => {
     return prev + next.amount;
   }, 0);
+
+  onMount(async () => {
+    if (browser && spendings.length === 0) {
+      isLoading = true;
+
+      try {
+        spendings = await getAllSpendings();
+      } catch (error) {
+        console.error(`Failed to load spendings:`, error);
+      } finally {
+        isLoading = false;
+      }
+    }
+  });
 </script>
 
 <svelte:head>

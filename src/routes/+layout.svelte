@@ -1,11 +1,41 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import "../app.css";
+  import { authStore } from "$lib/stores/auth";
+  import { goto } from "$app/navigation";
+
+  let checkSessionInterval: number;
+
+  onMount(() => {
+    checkSessionInterval = setInterval(() => {
+      if (
+        window.location.pathname !== "/login" &&
+        !authStore.isSessionValid()
+      ) {
+        goto("/login");
+      }
+    }, 60000);
+
+    return () => {
+      clearInterval(checkSessionInterval);
+    };
+  });
 </script>
 
 <div class="app">
   <header class="app-header">
     <div class="header-content">
       <h1 class="site-title">Spending Tracker</h1>
+
+      {#if $authStore.isAuthenticated}
+        <button
+          class="btn secondary logout-btn"
+          on:click={() => {
+            authStore.logout();
+            goto("/login");
+          }}>Logout</button
+        >
+      {/if}
     </div>
   </header>
 
@@ -37,12 +67,20 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .site-title {
     font-size: 1.5rem;
     font-weight: 500;
     margin: 0;
+  }
+
+  .logout-btn {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
   }
 
   .main-content {

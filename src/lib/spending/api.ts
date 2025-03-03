@@ -1,9 +1,9 @@
 import { config } from "$lib/config";
 import ky from "ky";
 import type { Spending, SpendingFilter } from "./interfaces";
+import { browser } from "$app/environment";
 
 const httpClient = ky.create({
-  prefixUrl: config.api.baseUrl,
   retry: {
     limit: 2,
     methods: ["get"],
@@ -21,6 +21,8 @@ const httpClient = ky.create({
 });
 
 export async function getAllSpendings(): Promise<Spending[]> {
+  if (!browser) return []
+
   try {
     const response = await httpClient
       .get<Spending[]>(config.api.endpoints.spendings)

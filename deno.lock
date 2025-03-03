@@ -4,6 +4,7 @@
     "npm:@sveltejs/adapter-auto@4": "4.0.0_@sveltejs+kit@2.17.3__@sveltejs+vite-plugin-svelte@5.0.3___svelte@5.20.5____acorn@8.14.0___vite@6.2.0__svelte@5.20.5___acorn@8.14.0__vite@6.2.0_@sveltejs+vite-plugin-svelte@5.0.3__svelte@5.20.5___acorn@8.14.0__vite@6.2.0_svelte@5.20.5__acorn@8.14.0_vite@6.2.0",
     "npm:@sveltejs/kit@^2.16.0": "2.17.3_@sveltejs+vite-plugin-svelte@5.0.3__svelte@5.20.5___acorn@8.14.0__vite@6.2.0_svelte@5.20.5__acorn@8.14.0_vite@6.2.0",
     "npm:@sveltejs/vite-plugin-svelte@5": "5.0.3_svelte@5.20.5__acorn@8.14.0_vite@6.2.0",
+    "npm:@types/node@20.11.0": "20.11.0",
     "npm:dayjs@^1.11.13": "1.11.13",
     "npm:ky@^1.7.5": "1.7.5",
     "npm:prettier-plugin-svelte@^3.3.3": "3.3.3_prettier@3.5.2_svelte@5.20.5__acorn@8.14.0",
@@ -233,6 +234,12 @@
     },
     "@types/estree@1.0.6": {
       "integrity": "sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw=="
+    },
+    "@types/node@20.11.0": {
+      "integrity": "sha512-o9bjXmDNcF7GbM4CNQpmi+TutCgap/K3w1JyKgxAjqx41zp9qlIAVFi0IhCNsJcXolEqLWhbFbEeL0PvYm4pcQ==",
+      "dependencies": [
+        "undici-types"
+      ]
     },
     "acorn-typescript@1.4.13_acorn@8.14.0": {
       "integrity": "sha512-xsc9Xv0xlVfwp2o7sQ+GCQ1PgbkdcpWdTzrwXxO3xDMTAywVS3oXVOcOHuRjAPkS4P9b+yc/qNF15460v+jp4Q==",
@@ -464,6 +471,9 @@
     "typescript@5.8.2": {
       "integrity": "sha512-aJn6wq13/afZp/jT9QZmwEjDqqvSGp1VT5GVg+f/t6/oVyrgXM6BY1h9BRh/O5p3PlUPAe+WuiEZOmb/49RqoQ=="
     },
+    "undici-types@5.26.5": {
+      "integrity": "sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA=="
+    },
     "vite@6.2.0": {
       "integrity": "sha512-7dPxoo+WsT/64rDcwoOjk76XHj+TqNTIvHKcuMQ1k4/SeHDaQt5GFAeLYzrimZrMpn/O6DtdI03WUjdxuPM0oQ==",
       "dependencies": [
@@ -489,6 +499,7 @@
         "npm:@sveltejs/adapter-auto@4",
         "npm:@sveltejs/kit@^2.16.0",
         "npm:@sveltejs/vite-plugin-svelte@5",
+        "npm:@types/node@20.11.0",
         "npm:dayjs@^1.11.13",
         "npm:ky@^1.7.5",
         "npm:prettier-plugin-svelte@^3.3.3",
