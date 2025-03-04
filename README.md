@@ -17,10 +17,9 @@ Currently only showing my spendings data for the last 7 days
 ### Prerequisites
 
 - Node.js (LTS version recommended)
-- Deno
 
 ### Run the Application
 
 ```
-deno task dev --open
+npm run dev
 ```
