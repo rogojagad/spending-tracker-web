@@ -4,7 +4,7 @@
   import { authStore } from "$lib/stores/auth";
   import { goto } from "$app/navigation";
 
-  let checkSessionInterval: number;
+  let checkSessionInterval: NodeJS.Timeout;
 
   onMount(() => {
     checkSessionInterval = setInterval(() => {
@@ -45,7 +45,7 @@
 
   <footer class="app-footer">
     <div class="footer-content">
-      <p>© {new Date().getFullYear()} Spending Tracker</p>
+      <p>© {new Date().getFullYear()} OTRW - Spending Tracker</p>
     </div>
   </footer>
 </div>

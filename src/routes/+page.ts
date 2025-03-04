@@ -1,6 +1,6 @@
 import { browser } from "$app/environment";
-import { getAllSpendings } from "$lib/spending/api";
-import type { Spending } from "$lib/spending/interfaces";
+import { getManySpendings } from "$lib/api";
+import type { Spending } from "$lib/interfaces";
 import type { PageLoad } from "./$types";
 
 export interface PageData {
@@ -9,9 +9,9 @@ export interface PageData {
 
 export const load: PageLoad = async (): Promise<PageData> => {
   if (browser) {
-    const spendings = await getAllSpendings();
+    const spendings = await getManySpendings({});
     return { spendings };
   }
 
-  return { spendings: [] }
+  return { spendings: [] };
 };

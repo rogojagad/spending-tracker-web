@@ -3,9 +3,11 @@
   import type { PageData } from "./+page";
   import "../types/number";
   import "../types/dayjs";
-  import { onMount } from "svelte";
-  import { browser } from "$app/environment";
-  import { getAllSpendings } from "$lib/spending/api";
+  import CategoryFilter from "$lib/components/categoryFilter.svelte";
+  import type { SpendingCreatedAtRange, SpendingFilter } from "$lib/interfaces";
+  import SourceFilter from "$lib/components/sourceFilter.svelte";
+  import SpentAtFilter from "$lib/components/spentAtFilter.svelte";
+  import { getManySpendings } from "$lib/api";
 
   export let data: PageData;
 
@@ -16,19 +18,25 @@
     return prev + next.amount;
   }, 0);
 
-  onMount(async () => {
-    if (browser && spendings.length === 0) {
-      isLoading = true;
+  let selectedCategoryId: string;
+  let selectedSourceId: string;
+  let selectedSpentAtRange: SpendingCreatedAtRange;
 
-      try {
-        spendings = await getAllSpendings();
-      } catch (error) {
-        console.error(`Failed to load spendings:`, error);
-      } finally {
-        isLoading = false;
-      }
-    }
-  });
+  async function handleFilterSubmitted() {
+    console.log(`category ID`, selectedCategoryId);
+    console.log(`source ID`, selectedSourceId);
+    console.log(`date range`, selectedSpentAtRange);
+
+    const filterQuery: SpendingFilter = {
+      fromInclusive: selectedSpentAtRange.fromInclusive,
+      toExclusive: selectedSpentAtRange.toExclusive,
+    };
+
+    if (selectedCategoryId !== "ALL") filterQuery.category = selectedCategoryId;
+    if (selectedSourceId !== "ALL") filterQuery.source = selectedSourceId;
+
+    spendings = await getManySpendings(filterQuery);
+  }
 </script>
 
 <svelte:head>
@@ -62,9 +70,21 @@
   <div class="card data-table-card">
     <div class="card-header">
       <h3>Spending Records</h3>
-      <div class="card-actions">
-        <!-- Future filter/search controls could go here -->
-      </div>
+
+      <form
+        class="card-actions"
+        on:submit|preventDefault={handleFilterSubmitted}
+      >
+        <CategoryFilter bind:selectedCategoryId />
+        <SourceFilter bind:selectedSourceId />
+        <SpentAtFilter bind:selectedSpentAtRange />
+
+        <div class="filter-button">
+          <button type="submit" class="btn primary" disabled={isLoading}>
+            {isLoading ? "Filtering..." : "Filter"}</button
+          >
+        </div>
+      </form>
     </div>
 
     {#if spendings.length === 0}
@@ -138,6 +158,13 @@
     margin-bottom: 2rem;
   }
 
+  .card-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
   .summary-card {
     background-color: var(--color-green-light);
     text-align: center;
@@ -154,8 +181,7 @@
   }
 
   .card-header {
-    display: flex;
-    justify-content: space-between;
+    display: flexbox;
     align-items: center;
     margin-bottom: 1.5rem;
   }
@@ -284,5 +310,10 @@
     to {
       transform: rotate(360deg);
     }
+  }
+
+  .filter-button {
+    grid-column-start: -1;
+    padding-top: 50%;
   }
 </style>
