@@ -17,16 +17,33 @@
   $: totalAmount = spendings.reduce((prev, next) => {
     return prev + next.amount;
   }, 0);
+  $: totalPrimary = spendings
+    .filter((spending) => {
+      return spending.categoryName === "Primary";
+    })
+    .reduce((prev, next) => {
+      return prev + next.amount;
+    }, 0);
+  $: totalSecondary = spendings
+    .filter((spending) => {
+      return spending.categoryName === "Secondary";
+    })
+    .reduce((prev, next) => {
+      return prev + next.amount;
+    }, 0);
+  $: totalTernary = spendings
+    .filter((spending) => {
+      return spending.categoryName === "Ternary";
+    })
+    .reduce((prev, next) => {
+      return prev + next.amount;
+    }, 0);
 
   let selectedCategoryId: string;
   let selectedSourceId: string;
   let selectedSpentAtRange: SpendingCreatedAtRange;
 
   async function handleFilterSubmitted() {
-    console.log(`category ID`, selectedCategoryId);
-    console.log(`source ID`, selectedSourceId);
-    console.log(`date range`, selectedSpentAtRange);
-
     const filterQuery: SpendingFilter = {
       fromInclusive: selectedSpentAtRange.fromInclusive,
       toExclusive: selectedSpentAtRange.toExclusive,
@@ -58,9 +75,27 @@
 
   <div class="dashboard-grid">
     <!-- Summary card -->
-    <div class="card summary-card">
+    <div class="card amount-summary-card">
       <h3>Total Spending</h3>
-      <p class="amount">{totalAmount.toIDRString()}</p>
+      <p>{totalAmount.toIDRString()}</p>
+    </div>
+
+    <!-- Future cards for other statistics could go here -->
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- Summary card -->
+    <div class="card amount-primary-card">
+      <h3>Primary</h3>
+      <p>{totalPrimary.toIDRString()}</p>
+    </div>
+    <div class="card amount-secondary-card">
+      <h3>Secondary</h3>
+      <p>{totalSecondary.toIDRString()}</p>
+    </div>
+    <div class="card amount-ternary-card">
+      <h3>Ternary</h3>
+      <p>{totalTernary.toIDRString()}</p>
     </div>
 
     <!-- Future cards for other statistics could go here -->
@@ -165,15 +200,34 @@
     margin-bottom: 2rem;
   }
 
-  .summary-card {
-    background-color: var(--color-green-light);
+  .amount-summary-card {
     text-align: center;
+    font-size: 2rem;
+    font-weight: 600;
   }
 
-  .amount {
+  .amount-primary-card {
+    background-color: var(--color-green-light);
+    text-align: center;
     font-size: 2rem;
     font-weight: 600;
     color: var(--color-green-dark);
+  }
+
+  .amount-secondary-card {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 600;
+    background-color: var(--color-blue-light);
+    color: var(--color-blue-dark);
+  }
+
+  .amount-ternary-card {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 600;
+    background-color: #fff3e0;
+    color: #795548;
   }
 
   .data-table-card {
@@ -246,14 +300,14 @@
 
   /* Secondary category (medium urgency) */
   .category-badge.secondary {
-    background-color: #fff3e0;
-    color: #795548;
+    background-color: var(--color-blue-light);
+    color: var(--text-primary);
   }
 
   /* Tertiary category (lowest urgency) */
   .category-badge.tertiary {
-    background-color: var(--color-blue-light);
-    color: var(--text-primary);
+    background-color: #fff3e0;
+    color: #795548;
   }
 
   .empty-state {
