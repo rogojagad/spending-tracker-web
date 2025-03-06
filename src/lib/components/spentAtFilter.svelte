@@ -13,6 +13,13 @@
       },
     ],
     [
+      "Yesterday",
+      {
+        fromInclusive: dayjs().subtract(1, "day").startOf("day").toISOString(),
+        toExclusive: dayjs().startOf("day").toISOString(),
+      },
+    ],
+    [
       "Last 3 Days",
       {
         fromInclusive: dayjs().subtract(3, "day").startOf("day").toISOString(),
