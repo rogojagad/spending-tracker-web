@@ -30,3 +30,7 @@ export interface SpendingCreatedAtRange {
   fromInclusive: string;
   toExclusive: string;
 }
+
+export interface AuthResponse {
+  token: string
+}

@@ -1,11 +1,13 @@
 import { config } from "$lib/config";
 import ky from "ky";
 import type {
+  AuthResponse,
   Spending,
   SpendingCategory,
   SpendingFilter,
   SpendingSource,
 } from "./interfaces";
+import { authStore } from "./stores/auth";
 
 const httpClient = ky.create({
   prefixUrl: config.api.baseUrl,
@@ -28,6 +30,7 @@ const httpClient = ky.create({
 export async function getManySpendings(
   spendingFilter?: SpendingFilter,
 ): Promise<Spending[]> {
+  const { token } = authStore.getToken()
   try {
     const searchParam = new URLSearchParams();
 
@@ -46,7 +49,7 @@ export async function getManySpendings(
     const response = await httpClient
       .get<
         Spending[]
-      >(config.api.endpoints.spendings, { searchParams: searchParam })
+      >(config.api.endpoints.spendings, { searchParams: searchParam, headers: { Authorization: `Bearer ${token}` } })
       .json();
 
     return response;
@@ -57,9 +60,10 @@ export async function getManySpendings(
 }
 
 export async function getAllCategories(): Promise<SpendingCategory[]> {
+  const { token } = authStore.getToken()
   try {
     const response = await httpClient
-      .get<SpendingCategory[]>(config.api.endpoints.categories)
+      .get<SpendingCategory[]>(config.api.endpoints.categories, { headers: { Authorization: `Bearer ${token}` } })
       .json();
 
     return response;
@@ -70,14 +74,25 @@ export async function getAllCategories(): Promise<SpendingCategory[]> {
 }
 
 export async function getAllSources(): Promise<SpendingSource[]> {
+  const { token } = authStore.getToken()
   try {
     const response = await httpClient
-      .get<SpendingSource[]>(config.api.endpoints.sources)
+      .get<SpendingSource[]>(config.api.endpoints.sources, { headers: { Authorization: `Bearer ${token}` } })
       .json();
 
     return response;
   } catch (error) {
     console.error(`Failed fetching categories ${error}`, error);
+    throw error;
+  }
+}
+
+export async function auth(password: string): Promise<AuthResponse> {
+  try {
+    const response = await httpClient.post<AuthResponse>(config.api.endpoints.auth, { json: { password } }).json()
+    return response
+  } catch (error) {
+    console.error(`Failed doing auth ${error}`, error);
     throw error;
   }
 }

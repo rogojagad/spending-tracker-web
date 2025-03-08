@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { auth } from "$lib/api";
   import { authStore } from "$lib/stores/auth";
   import { onMount } from "svelte";
 
@@ -14,20 +15,18 @@
     }
 
     isLoading = true;
-    error = "";
 
     try {
-      const data = { isAllowed: true }; // TODO: implement actual auth on API
+      const { token } = await auth(password);
 
-      if (data.isAllowed) {
-        authStore.authenticate();
+      if (token) {
+        authStore.authenticate(token);
         goto("/");
       } else {
         error = "Invalid password";
       }
-    } catch (error) {
+    } catch (_err) {
       error = "Failed when verifying password. Please try again";
-      console.error(error);
     } finally {
       isLoading = false;
     }

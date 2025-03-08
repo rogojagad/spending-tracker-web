@@ -14,7 +14,7 @@
       ) {
         goto("/login");
       }
-    }, 60000);
+    }, 6000);
 
     return () => {
       clearInterval(checkSessionInterval);
