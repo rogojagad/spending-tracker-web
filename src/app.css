@@ -168,6 +168,8 @@ textarea {
   font-size: 0.95rem;
   font-family: inherit;
   width: 100%;
+  max-width: 100%; /* Add this to prevent overflow */
+  box-sizing: border-box; /* Add this to include padding in width calculation */
 }
 
 input:focus,
@@ -182,4 +184,20 @@ label {
   margin-bottom: 0.3rem;
   color: var(--text-secondary);
   display: block;
+}
+
+.filter-group {
+  width: 100%;
+}
+
+.filter-group h5 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .filter-group {
+    margin-bottom: 0.5rem;
+  }
 }

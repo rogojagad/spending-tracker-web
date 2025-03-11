@@ -4,10 +4,10 @@
   export let selectedSpentAtRange: SpendingCreatedAtRange;
 </script>
 
-<div class="filter-card">
+<div class="filter-group">
   <h5>Filter By Date Range</h5>
 
-  <div class="category-filter">
+  <div>
     <select
       placeholder="Spent at"
       bind:value={selectedSpentAtRange}

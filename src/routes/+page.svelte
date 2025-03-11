@@ -381,6 +381,22 @@
       grid-template-columns: 1fr;
     }
 
+    .card-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .filter-button {
+      margin-top: 0.5rem;
+      padding-top: 0;
+    }
+
+    .filter-button button {
+      width: 100%;
+    }
+
     .data-table th,
     .data-table td {
       padding: 0.6rem;
@@ -423,6 +439,5 @@
 
   .filter-button {
     grid-column-start: -1;
-    padding-top: 50%;
   }
 </style>
