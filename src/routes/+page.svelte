@@ -1,47 +1,64 @@
 <script lang="ts">
   import dayjs from "dayjs";
-  import type { PageData } from "./+page";
   import "../types/number";
   import "../types/dayjs";
-  import CategoryFilter from "$lib/components/categoryFilter.svelte";
-  import type { SpendingCreatedAtRange, SpendingFilter } from "$lib/interfaces";
-  import SourceFilter from "$lib/components/sourceFilter.svelte";
-  import SpentAtFilter from "$lib/components/spentAtFilter.svelte";
-  import { getManySpendings } from "$lib/api";
+  import type {
+    Spending,
+    SpendingCategory,
+    SpendingCreatedAtRange,
+    SpendingFilter,
+    SpendingSource,
+  } from "$lib/interfaces";
+  import DateRangeFilter from "$lib/components/dateRangeFilter.svelte";
+  import { getAllCategories, getAllSources, getManySpendings } from "$lib/api";
 
-  export let data: PageData;
+  import { onMount } from "svelte";
+  import { dateRangeNameToDateValueMap } from "$lib/constants";
+  import DropdownFilter from "$lib/components/dropdownFilter.svelte";
 
-  let { spendings } = data;
   let isLoading = false; // For future filter operations
+  let spendings: Spending[] = $state([]);
+  let sources: SpendingSource[] = $state([]);
+  let categories: SpendingCategory[] = $state([]);
 
-  $: totalAmount = spendings.reduce((prev, next) => {
-    return prev + next.amount;
-  }, 0);
-  $: totalPrimary = spendings
-    .filter((spending) => {
-      return spending.categoryName === "Primary";
-    })
-    .reduce((prev, next) => {
-      return prev + next.amount;
-    }, 0);
-  $: totalSecondary = spendings
-    .filter((spending) => {
-      return spending.categoryName === "Secondary";
-    })
-    .reduce((prev, next) => {
-      return prev + next.amount;
-    }, 0);
-  $: totalTernary = spendings
-    .filter((spending) => {
-      return spending.categoryName === "Ternary";
-    })
-    .reduce((prev, next) => {
-      return prev + next.amount;
-    }, 0);
+  let selectedCategoryId: string = $state("ALL");
+  let selectedSourceId: string = $state("ALL");
+  let selectedSpentAtRange: SpendingCreatedAtRange = $state(
+    dateRangeNameToDateValueMap.get("Today")!,
+  );
 
-  let selectedCategoryId: string;
-  let selectedSourceId: string;
-  let selectedSpentAtRange: SpendingCreatedAtRange;
+  const totalAmount = $derived(
+    spendings.reduce((prev, next) => {
+      return prev + next.amount;
+    }, 0),
+  );
+  const totalPrimary = $derived(
+    spendings
+      .filter((spending) => {
+        return spending.categoryName === "Primary";
+      })
+      .reduce((prev, next) => {
+        return prev + next.amount;
+      }, 0),
+  );
+  const totalSecondary = $derived(
+    spendings
+      .filter((spending) => {
+        return spending.categoryName === "Secondary";
+      })
+      .reduce((prev, next) => {
+        return prev + next.amount;
+      }, 0),
+  );
+  const totalTernary = $derived(
+    spendings
+      .filter((spending) => {
+        return spending.categoryName === "Ternary";
+      })
+      .reduce((prev, next) => {
+        return prev + next.amount;
+      }, 0),
+  );
 
   async function handleFilterSubmitted() {
     const filterQuery: SpendingFilter = {
@@ -54,6 +71,17 @@
 
     spendings = await getManySpendings(filterQuery);
   }
+
+  onMount(async () => {
+    [spendings, categories, sources] = await Promise.all([
+      getManySpendings({}),
+      getAllCategories(),
+      getAllSources(),
+    ]);
+
+    categories.unshift({ id: "ALL", name: "All Categories", priority: 0 });
+    sources.unshift({ id: "ALL", name: "All Sources", isActive: true });
+  });
 </script>
 
 <svelte:head>
@@ -108,11 +136,38 @@
 
       <form
         class="card-actions"
-        on:submit|preventDefault={handleFilterSubmitted}
+        onsubmit={(e) => {
+          e.preventDefault();
+          handleFilterSubmitted();
+        }}
       >
-        <CategoryFilter bind:selectedCategoryId />
-        <SourceFilter bind:selectedSourceId />
-        <SpentAtFilter bind:selectedSpentAtRange />
+        <DropdownFilter
+          bind:value={selectedCategoryId}
+          data={{
+            placeholder: "Categories",
+            title: "Filter by Category",
+            options: categories.map((category) => ({
+              value: category.id,
+              name: category.name,
+            })),
+          }}
+        />
+
+        <DropdownFilter
+          bind:value={selectedSourceId}
+          data={{
+            placeholder: "Sources",
+            title: "Filter by Source",
+            options: sources
+              .filter((source) => source.isActive)
+              .map((source) => ({
+                value: source.id,
+                name: source.name,
+              })),
+          }}
+        />
+
+        <DateRangeFilter bind:selectedSpentAtRange />
 
         <div class="filter-button">
           <button type="submit" class="btn primary" disabled={isLoading}>
