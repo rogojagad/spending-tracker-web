@@ -2,17 +2,24 @@
   import { onMount } from "svelte";
   import "../app.css";
   import { authStore } from "$lib/stores/auth";
-  import { goto } from "$app/navigation";
+  import { afterNavigate, goto } from "$app/navigation";
+  import type { AfterNavigate } from "@sveltejs/kit";
 
   let checkSessionInterval: NodeJS.Timeout;
+  let isNavbarHovered = $state(false);
+  let isLoginPage = $state(true);
+
+  let { children } = $props();
+
+  afterNavigate((navigation: AfterNavigate) => {
+    const destinationRoute = navigation.to?.route.id || "";
+    isLoginPage = destinationRoute === "/login";
+  });
 
   onMount(() => {
     checkSessionInterval = setInterval(() => {
-      if (
-        window.location.pathname !== "/login" &&
-        !authStore.isSessionValid()
-      ) {
-        goto("/login");
+      if (!isLoginPage && !authStore.isSessionValid()) {
+        goto("/login", { replaceState: true });
       }
     }, 6000);
 
@@ -30,7 +37,7 @@
       {#if $authStore.isAuthenticated}
         <button
           class="btn secondary logout-btn"
-          on:click={() => {
+          onclick={() => {
             authStore.logout();
             goto("/login");
           }}>Logout</button
@@ -39,8 +46,32 @@
     </div>
   </header>
 
+  {#if !isLoginPage}
+    <nav
+      class="sidebar"
+      class:expanded={isNavbarHovered}
+      onmouseenter={() => (isNavbarHovered = true)}
+      onmouseleave={() => (isNavbarHovered = false)}
+    >
+      <ul class="nav-links">
+        <li>
+          <a href="/" class="nav-link">
+            <span class="icon">📊</span>
+            <span class="link-text">Overview</span>
+          </a>
+        </li>
+        <li>
+          <a href="/summary" class="nav-link">
+            <span class="icon">📝</span>
+            <span class="link-text">Summary</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  {/if}
+
   <main class="main-content">
-    <slot />
+    {@render children()}
   </main>
 
   <footer class="app-footer">
@@ -104,5 +135,60 @@
     margin: 0 auto;
     padding: 0 2rem;
     text-align: center;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 64px; /* Adjust this value based on your header height */
+    left: 0;
+    height: calc(100vh - 64px); /* Viewport height minus header height */
+    background-color: #f8f9fa;
+    width: 60px;
+    transition: width 0.3s ease;
+    overflow: hidden;
+    border-right: 1px solid #e9ecef;
+    z-index: 100; /* Ensure sidebar appears above page content */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+  }
+
+  .main-content {
+    flex: 1;
+    padding: 2rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .sidebar.expanded {
+    width: 200px;
+  }
+
+  .nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    color: #495057;
+    text-decoration: none;
+    transition: background-color 0.2s;
+  }
+
+  .nav-link:hover {
+    background-color: #e9ecef;
+  }
+
+  .icon {
+    font-size: 1.2rem;
+    min-width: 24px;
+  }
+
+  .link-text {
+    margin-left: 1rem;
+    white-space: nowrap;
   }
 </style>
