@@ -94,6 +94,19 @@ a:focus {
   text-decoration: underline;
 }
 
+.page-container {
+  width: 100%;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  margin-top: -0.5rem;
+}
+
 /* Accessibility improvements */
 :focus {
   outline: 2px solid var(--color-blue-dark);

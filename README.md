@@ -21,5 +21,5 @@ Currently only showing my spendings data for the last 7 days
 ### Run the Application
 
 ```
-npm run dev
+deno task dev
 ```

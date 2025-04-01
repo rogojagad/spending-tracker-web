@@ -85,7 +85,7 @@
 </script>
 
 <svelte:head>
-  <title>My Spending Tracker</title>
+  <title>My Spending Tracker - Overview</title>
 </svelte:head>
 
 <div class="page-container">
@@ -97,8 +97,8 @@
   {/if}
 
   <section class="page-header">
-    <h2>Your Spending Overview</h2>
-    <p class="subtitle">View and analyze your spending records</p>
+    <h2>Spending Overview</h2>
+    <p class="subtitle">View your spending records</p>
   </section>
 
   <div class="dashboard-grid">
@@ -228,19 +228,6 @@
 </div>
 
 <style>
-  .page-container {
-    width: 100%;
-  }
-
-  .page-header {
-    margin-bottom: 2rem;
-  }
-
-  .subtitle {
-    color: var(--text-secondary);
-    margin-top: -0.5rem;
-  }
-
   .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
