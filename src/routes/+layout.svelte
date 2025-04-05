@@ -37,6 +37,7 @@
       {#if $authStore.isAuthenticated}
         <div class="header-right">
           <nav class="header-nav">
+            <button class="mobile-menu-btn">☰</button>
             <ul class="nav-links">
               <li><a href="/" class="nav-link">Overview</a></li>
               <li><a href="/summary" class="nav-link">Summary</a></li>
@@ -125,6 +126,16 @@
     margin: 0 2rem;
   }
 
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .header-nav {
+    margin: 0; /* Remove the previous margin */
+  }
+
   .nav-links {
     list-style: none;
     padding: 0;
@@ -146,13 +157,59 @@
     text-decoration: none;
   }
 
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+  .mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
   }
 
-  .header-nav {
-    margin: 0; /* Remove the previous margin */
+  @media (max-width: 768px) {
+    .header-content {
+      padding: 1rem;
+    }
+
+    .header-right {
+      position: relative;
+    }
+
+    .mobile-menu-btn {
+      display: block;
+    }
+
+    .nav-links {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background-color: #78909c;
+      flex-direction: column;
+      min-width: 200px;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      margin-top: 0.5rem;
+    }
+
+    .header-nav:hover .nav-links,
+    .header-nav:focus-within .nav-links {
+      display: flex;
+    }
+
+    .nav-link {
+      padding: 0.75rem 1rem;
+      width: 100%;
+    }
+
+    .nav-link:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .logout-btn {
+      font-size: 0.8rem;
+      padding: 0.3rem 0.6rem;
+    }
   }
 </style>
