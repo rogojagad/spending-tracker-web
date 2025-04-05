@@ -35,40 +35,24 @@
       <h1 class="site-title">Spending Tracker</h1>
 
       {#if $authStore.isAuthenticated}
-        <button
-          class="btn secondary logout-btn"
-          onclick={() => {
-            authStore.logout();
-            goto("/login");
-          }}>Logout</button
-        >
+        <div class="header-right">
+          <nav class="header-nav">
+            <ul class="nav-links">
+              <li><a href="/" class="nav-link">Overview</a></li>
+              <li><a href="/summary" class="nav-link">Summary</a></li>
+            </ul>
+          </nav>
+          <button
+            class="btn secondary logout-btn"
+            onclick={() => {
+              authStore.logout();
+              goto("/login");
+            }}>Logout</button
+          >
+        </div>
       {/if}
     </div>
   </header>
-
-  {#if !isLoginPage}
-    <nav
-      class="sidebar"
-      class:expanded={isNavbarHovered}
-      onmouseenter={() => (isNavbarHovered = true)}
-      onmouseleave={() => (isNavbarHovered = false)}
-    >
-      <ul class="nav-links">
-        <li>
-          <a href="/" class="nav-link">
-            <span class="icon">📊</span>
-            <span class="link-text">Overview</span>
-          </a>
-        </li>
-        <li>
-          <a href="/summary" class="nav-link">
-            <span class="icon">📝</span>
-            <span class="link-text">Summary</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
-  {/if}
 
   <main class="main-content">
     {@render children()}
@@ -137,58 +121,38 @@
     text-align: center;
   }
 
-  .sidebar {
-    position: fixed;
-    top: 64px; /* Adjust this value based on your header height */
-    left: 0;
-    height: calc(100vh - 64px); /* Viewport height minus header height */
-    background-color: #f8f9fa;
-    width: 60px;
-    transition: width 0.3s ease;
-    overflow: hidden;
-    border-right: 1px solid #e9ecef;
-    z-index: 100; /* Ensure sidebar appears above page content */
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
-  }
-
-  .main-content {
-    flex: 1;
-    padding: 2rem;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .sidebar.expanded {
-    width: 200px;
+  .header-nav {
+    margin: 0 2rem;
   }
 
   .nav-links {
     list-style: none;
     padding: 0;
     margin: 0;
+    display: flex;
   }
 
   .nav-link {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    color: #495057;
+    color: white;
     text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
     transition: background-color 0.2s;
   }
 
   .nav-link:hover {
-    background-color: #e9ecef;
+    background-color: rgba(255, 255, 255, 0.1);
+    text-decoration: none;
   }
 
-  .icon {
-    font-size: 1.2rem;
-    min-width: 24px;
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
 
-  .link-text {
-    margin-left: 1rem;
-    white-space: nowrap;
+  .header-nav {
+    margin: 0; /* Remove the previous margin */
   }
 </style>
