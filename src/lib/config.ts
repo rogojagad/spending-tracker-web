@@ -7,6 +7,7 @@ export const config = {
       spendings: "spendings",
       categories: "categories",
       sources: "sources",
+      spendingSummariesMonthly: "spendings/summaries/months"
     },
   },
 
@@ -17,5 +18,8 @@ export const config = {
   },
 
   // Date formatting
-  dateFormat: "DD MMM YYYY",
+  dateFormat: {
+    dayAndMonth: "DD MMM YYYY",
+    monthOnly: "MMM YYYY",
+  }
 };

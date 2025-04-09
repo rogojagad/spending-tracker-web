@@ -31,6 +31,15 @@ export interface SpendingCreatedAtRange {
   toExclusive: string;
 }
 
+export interface MonthSpendingSummary {
+  month: Date;
+  total: number;
+  summaries: {
+    amount: number;
+    categoryName: string;
+  }[]
+}
+
 export interface AuthResponse {
   token: string
 }

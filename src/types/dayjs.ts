@@ -3,12 +3,17 @@ import { config } from "$lib/config";
 
 declare module 'dayjs' {
     interface Dayjs {
-        toFormattedDate(): string
+        formatWithDayAndMonth(): string
+        formatWithMonthOnly(): string
     }
 }
 
-dayjs.prototype.toFormattedDate = function (): string {
-    return this.format(config.dateFormat)
+dayjs.prototype.formatWithDayAndMonth = function (): string {
+    return this.format(config.dateFormat.dayAndMonth)
+}
+
+dayjs.prototype.formatWithMonthOnly = function (): string {
+    return this.format(config.dateFormat.monthOnly)
 }
 
 export default dayjs

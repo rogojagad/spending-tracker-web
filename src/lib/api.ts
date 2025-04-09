@@ -2,6 +2,7 @@ import { config } from "$lib/config";
 import ky from "ky";
 import type {
   AuthResponse,
+  MonthSpendingSummary,
   Spending,
   SpendingCategory,
   SpendingFilter,
@@ -83,6 +84,20 @@ export async function getAllSources(): Promise<SpendingSource[]> {
     return response;
   } catch (error) {
     console.error(`Failed fetching categories ${error}`, error);
+    throw error;
+  }
+}
+
+export async function getMonthlySpendingSummaries(): Promise<MonthSpendingSummary[]> {
+  const { token } = authStore.getToken()
+  try {
+    const response = await httpClient
+      .get<MonthSpendingSummary[]>(config.api.endpoints.spendingSummariesMonthly, { headers: { Authorization: `Bearer ${token}` } })
+      .json();
+
+    return response;
+  } catch (error) {
+    console.error(`Failed fetching spending summaries ${error}`, error);
     throw error;
   }
 }

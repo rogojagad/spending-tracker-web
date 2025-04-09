@@ -131,6 +131,37 @@ a:focus {
   margin-bottom: 1.5rem;
 }
 
+.data-table-card {
+  overflow: hidden;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+  font-weight: 600;
+  color: var(--text-secondary);
+  background-color: var(--color-gray-light);
+}
+
+.data-table tr:hover {
+  background-color: var(--color-blue-light);
+}
+
 .btn {
   display: inline-block;
   padding: 0.6rem 1.2rem;

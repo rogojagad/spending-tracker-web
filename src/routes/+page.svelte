@@ -197,7 +197,7 @@
           <tbody>
             {#each spendings as spending (spending.id)}
               <tr>
-                <td>{dayjs(spending.createdAt).toFormattedDate()}</td>
+                <td>{dayjs(spending.createdAt).formatWithDayAndMonth()}</td>
                 <td class="description-cell">{spending.description}</td>
                 <td>
                   {#if spending.categoryName === "Primary"}
@@ -272,41 +272,10 @@
     color: #795548;
   }
 
-  .data-table-card {
-    overflow: hidden;
-  }
-
   .card-header {
     display: flexbox;
     align-items: center;
     margin-bottom: 1.5rem;
-  }
-
-  .table-container {
-    overflow-x: auto;
-  }
-
-  .data-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.95rem;
-  }
-
-  .data-table th,
-  .data-table td {
-    padding: 0.8rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-  }
-
-  .data-table th {
-    font-weight: 600;
-    color: var(--text-secondary);
-    background-color: var(--color-gray-light);
-  }
-
-  .data-table tr:hover {
-    background-color: var(--color-blue-light);
   }
 
   .amount-column {
