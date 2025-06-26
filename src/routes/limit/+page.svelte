@@ -37,6 +37,14 @@
           <strong>Used Limit (Amount):</strong>
           {limit.usedValue.toIDRString()}
         </p>
+        <p>
+          <strong>Applied Category:</strong>
+          {limit.categoryName}
+        </p>
+        <p>
+          <strong>Applied Source:</strong>
+          {limit.sourceName}
+        </p>
       </div>
     {/each}
   {/if}

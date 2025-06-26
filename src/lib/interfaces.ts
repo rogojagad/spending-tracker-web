@@ -46,6 +46,8 @@ export interface Limit {
   value: number;
   categoryId?: string;
   sourceId?: string;
+  categoryName?: string;
+  sourceName?: string;
   usedValue: number;
   usedPercentage: number;
 }
