@@ -2,6 +2,7 @@ import { config } from "$lib/config";
 import ky from "ky";
 import type {
   AuthResponse,
+  Limit,
   MonthSpendingSummary,
   Spending,
   SpendingCategory,
@@ -31,7 +32,7 @@ const httpClient = ky.create({
 export async function getManySpendings(
   spendingFilter?: SpendingFilter,
 ): Promise<Spending[]> {
-  const { token } = authStore.getToken()
+  const { token } = authStore.getToken();
   try {
     const searchParam = new URLSearchParams();
 
@@ -61,10 +62,12 @@ export async function getManySpendings(
 }
 
 export async function getAllCategories(): Promise<SpendingCategory[]> {
-  const { token } = authStore.getToken()
+  const { token } = authStore.getToken();
   try {
     const response = await httpClient
-      .get<SpendingCategory[]>(config.api.endpoints.categories, { headers: { Authorization: `Bearer ${token}` } })
+      .get<
+        SpendingCategory[]
+      >(config.api.endpoints.categories, { headers: { Authorization: `Bearer ${token}` } })
       .json();
 
     return response;
@@ -75,10 +78,12 @@ export async function getAllCategories(): Promise<SpendingCategory[]> {
 }
 
 export async function getAllSources(): Promise<SpendingSource[]> {
-  const { token } = authStore.getToken()
+  const { token } = authStore.getToken();
   try {
     const response = await httpClient
-      .get<SpendingSource[]>(config.api.endpoints.sources, { headers: { Authorization: `Bearer ${token}` } })
+      .get<
+        SpendingSource[]
+      >(config.api.endpoints.sources, { headers: { Authorization: `Bearer ${token}` } })
       .json();
 
     return response;
@@ -88,11 +93,15 @@ export async function getAllSources(): Promise<SpendingSource[]> {
   }
 }
 
-export async function getMonthlySpendingSummaries(): Promise<MonthSpendingSummary[]> {
-  const { token } = authStore.getToken()
+export async function getMonthlySpendingSummaries(): Promise<
+  MonthSpendingSummary[]
+> {
+  const { token } = authStore.getToken();
   try {
     const response = await httpClient
-      .get<MonthSpendingSummary[]>(config.api.endpoints.spendingSummariesMonthly, { headers: { Authorization: `Bearer ${token}` } })
+      .get<
+        MonthSpendingSummary[]
+      >(config.api.endpoints.spendingSummariesMonthly, { headers: { Authorization: `Bearer ${token}` } })
       .json();
 
     return response;
@@ -102,10 +111,27 @@ export async function getMonthlySpendingSummaries(): Promise<MonthSpendingSummar
   }
 }
 
+export async function getSpendingLimits(): Promise<Limit[]> {
+  const { token } = authStore.getToken();
+  try {
+    const response = await httpClient
+      .get<
+        Limit[]
+      >(config.api.endpoints.limits, { headers: { Authorization: `Bearer ${token}` } })
+      .json();
+    return response;
+  } catch (error) {
+    console.error(`Failed fetching spending limits ${error}`, error);
+    throw error;
+  }
+}
+
 export async function auth(password: string): Promise<AuthResponse> {
   try {
-    const response = await httpClient.post<AuthResponse>(config.api.endpoints.auth, { json: { password } }).json()
-    return response
+    const response = await httpClient
+      .post<AuthResponse>(config.api.endpoints.auth, { json: { password } })
+      .json();
+    return response;
   } catch (error) {
     console.error(`Failed doing auth ${error}`, error);
     throw error;

@@ -4,10 +4,11 @@ export const config = {
     baseUrl: import.meta.env.VITE_API_BASE_URL,
     endpoints: {
       auth: "auth",
-      spendings: "spendings",
       categories: "categories",
+      limits: "limits",
       sources: "sources",
-      spendingSummariesMonthly: "spendings/summaries/months"
+      spendings: "spendings",
+      spendingSummariesMonthly: "spendings/summaries/months",
     },
   },
 
@@ -21,5 +22,5 @@ export const config = {
   dateFormat: {
     dayAndMonth: "DD MMM YYYY",
     monthOnly: "MMM YYYY",
-  }
+  },
 };

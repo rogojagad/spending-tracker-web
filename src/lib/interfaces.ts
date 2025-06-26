@@ -37,9 +37,19 @@ export interface MonthSpendingSummary {
   summaries: {
     amount: number;
     categoryName: string;
-  }[]
+  }[];
+}
+
+export interface Limit {
+  id: string;
+  name: string;
+  value: number;
+  categoryId?: string;
+  sourceId?: string;
+  usedValue: number;
+  usedPercentage: number;
 }
 
 export interface AuthResponse {
-  token: string
+  token: string;
 }
