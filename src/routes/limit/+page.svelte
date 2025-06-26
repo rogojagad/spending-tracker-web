@@ -39,11 +39,11 @@
         </p>
         <p>
           <strong>Applied Category:</strong>
-          {limit.categoryName}
+          {limit.categoryName ?? "-"}
         </p>
         <p>
           <strong>Applied Source:</strong>
-          {limit.sourceName}
+          {limit.sourceName ?? "-"}
         </p>
       </div>
     {/each}
