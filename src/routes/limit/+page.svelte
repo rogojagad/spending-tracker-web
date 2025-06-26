@@ -30,12 +30,12 @@
         <h3>{limit.name}</h3>
         <p><strong>Limit:</strong> {limit.value.toIDRString()}</p>
         <p>
-          <strong>Used Limit (Amount):</strong>
-          {limit.usedValue.toIDRString()}
+          <strong>Remaining Limit (Amount):</strong>
+          {(limit.value - limit.usedValue).toIDRString()}
         </p>
         <p>
-          <strong>Used Limit (%):</strong>
-          {limit.usedPercentage.toFixed(2)}%
+          <strong>Used Limit (Amount):</strong>
+          {limit.usedValue.toIDRString()}
         </p>
       </div>
     {/each}
