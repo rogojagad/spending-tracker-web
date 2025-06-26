@@ -41,6 +41,7 @@
             <ul class="nav-links">
               <li><a href="/" class="nav-link">Overview</a></li>
               <li><a href="/summary" class="nav-link">Summary</a></li>
+              <li><a href="/limit" class="nav-link">Limit</a></li>
             </ul>
           </nav>
           <button
