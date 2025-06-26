@@ -3,7 +3,7 @@
   import type { Limit } from "$lib/interfaces";
   import { onMount } from "svelte";
 
-  let isLoading = true;
+  let isLoading = $state(true);
   let limits: Limit[] = $state([]);
 
   onMount(async () => {
