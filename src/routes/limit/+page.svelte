@@ -7,9 +7,8 @@
   let limits: Limit[] = $state([]);
 
   onMount(async () => {
-    isLoading = false;
-
     limits = await getSpendingLimits();
+    isLoading = false;
   });
 </script>
 
@@ -25,14 +24,22 @@
 
   {#if isLoading}
     <p>Loading data...</p>
+  {:else}
+    {#each limits as limit}
+      <div class="card">
+        <h3>{limit.name}</h3>
+        <p><strong>Limit:</strong> {limit.value.toIDRString()}</p>
+        <p>
+          <strong>Used Limit (Amount):</strong>
+          {limit.usedValue.toIDRString()}
+        </p>
+        <p>
+          <strong>Used Limit (%):</strong>
+          {limit.usedPercentage.toFixed(2)}%
+        </p>
+      </div>
+    {/each}
   {/if}
-
-  {#each limits as limit}
-    <div class="card">
-      <h3>{limit.name}</h3>
-      <p>{limit.value.toIDRString()}</p>
-    </div>
-  {/each}
 </div>
 
 <style></style>
