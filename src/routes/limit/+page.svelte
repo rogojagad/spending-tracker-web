@@ -24,18 +24,15 @@
   </section>
 
   {#if isLoading}
-    <div class="loading-overlay">
-      <div class="loading-spinner"></div>
-      <p>Loading data...</p>
-    </div>
-  {:else}
-    {#each limits as limit}
-      <div class="card">
-        <h3>{limit.name}</h3>
-        <p>{limit.value.toIDRString()}</p>
-      </div>
-    {/each}
+    <p>Loading data...</p>
   {/if}
+
+  {#each limits as limit}
+    <div class="card">
+      <h3>{limit.name}</h3>
+      <p>{limit.value.toIDRString()}</p>
+    </div>
+  {/each}
 </div>
 
 <style></style>
