@@ -107,12 +107,6 @@
       <h3>Total Spending</h3>
       <p>{totalAmount.toIDRString()}</p>
     </div>
-
-    <!-- Future cards for other statistics could go here -->
-  </div>
-
-  <div class="dashboard-grid">
-    <!-- Summary card -->
     <div class="card amount-primary-card">
       <h3>Primary</h3>
       <p>{totalPrimary.toIDRString()}</p>
