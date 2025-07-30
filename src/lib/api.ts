@@ -4,6 +4,7 @@ import type {
   AuthResponse,
   Limit,
   MonthSpendingSummary,
+  Payday,
   Spending,
   SpendingCategory,
   SpendingFilter,
@@ -130,6 +131,19 @@ export async function auth(password: string): Promise<AuthResponse> {
   try {
     const response = await httpClient
       .post<AuthResponse>(config.api.endpoints.auth, { json: { password } })
+      .json();
+    return response;
+  } catch (error) {
+    console.error(`Failed doing auth ${error}`, error);
+    throw error;
+  }
+}
+
+export async function getLatestPayday(): Promise<Payday> {
+  const { token } = authStore.getToken();
+  try {
+    const response = await httpClient
+      .get<Payday>(config.api.endpoints.configs.latestPayday, { headers: { Authorization: `Bearer ${token}` } })
       .json();
     return response;
   } catch (error) {

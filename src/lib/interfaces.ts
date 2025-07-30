@@ -55,3 +55,11 @@ export interface Limit {
 export interface AuthResponse {
   token: string;
 }
+
+export interface Payday {
+  id: string;
+  note: string;
+  paydayDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}

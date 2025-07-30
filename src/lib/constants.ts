@@ -23,14 +23,14 @@ export const dateRangeNameToDateValueMap = new Map<
   [
     "Last 3 Days",
     {
-      fromInclusive: dayjs().subtract(3, "day").startOf("day").toISOString(),
+      fromInclusive: dayjs().subtract(2, "day").startOf("day").toISOString(),
       toExclusive: todayEndOfDayDateString,
     },
   ],
   [
     "Last 7 Days",
     {
-      fromInclusive: dayjs().subtract(7, "day").startOf("day").toISOString(),
+      fromInclusive: dayjs().subtract(6, "day").startOf("day").toISOString(),
       toExclusive: todayEndOfDayDateString,
     },
   ],

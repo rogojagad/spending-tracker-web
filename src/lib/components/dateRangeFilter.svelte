@@ -23,7 +23,7 @@
 </script>
 
 <div class="filter-group">
-  <h5>Filter By Date Range</h5>
+  <h5>{data.title}</h5>
 
   <div>
     {#if isLoading}

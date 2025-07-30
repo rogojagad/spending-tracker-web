@@ -8,18 +8,29 @@
     DateRange,
     SpendingFilter,
     SpendingSource,
+    Payday,
   } from "$lib/interfaces";
   import DateRangeFilter from "$lib/components/dateRangeFilter.svelte";
-  import { getAllCategories, getAllSources, getManySpendings } from "$lib/api";
+  import {
+    getAllCategories,
+    getAllSources,
+    getLatestPayday,
+    getManySpendings,
+  } from "$lib/api";
 
   import { onMount } from "svelte";
   import { dateRangeNameToDateValueMap } from "$lib/constants";
   import DropdownFilter from "$lib/components/dropdownFilter.svelte";
+  import { formatAppliedFilterHint } from "$lib/util/messageFormatter";
 
   let isLoading = false; // For future filter operations
   let spendings: Spending[] = $state([]);
   let sources: SpendingSource[] = $state([]);
   let categories: SpendingCategory[] = $state([]);
+  let spentAtRangeOptions: Map<string, DateRange> | undefined = $state();
+  let appliedFilterHint: string = $state("");
+
+  let latestPayday: Payday | undefined;
 
   let selectedCategoryId: string = $state("ALL");
   let selectedSourceId: string = $state("ALL");
@@ -70,17 +81,41 @@
     if (selectedSourceId !== "ALL") filterQuery.source = selectedSourceId;
 
     spendings = await getManySpendings(filterQuery);
+
+    appliedFilterHint = formatAppliedFilterHint(
+      categories.find((category) => category.id === selectedCategoryId)?.name ??
+        "ALL",
+      sources.find((source) => source.id === selectedSourceId)?.name || "ALL",
+      selectedSpentAtRange.fromInclusive,
+      selectedSpentAtRange.toExclusive,
+    );
   }
 
   onMount(async () => {
-    [spendings, categories, sources] = await Promise.all([
+    [spendings, categories, sources, latestPayday] = await Promise.all([
       getManySpendings({}),
       getAllCategories(),
       getAllSources(),
+      getLatestPayday(),
     ]);
 
     categories.unshift({ id: "ALL", name: "All Categories", priority: 0 });
     sources.unshift({ id: "ALL", name: "All Sources", isActive: true });
+    spentAtRangeOptions = dateRangeNameToDateValueMap.set(
+      "This Payday Period",
+      {
+        fromInclusive: dayjs(latestPayday.paydayDate).toISOString(),
+        toExclusive: dayjs().toISOString(),
+      },
+    );
+
+    appliedFilterHint = appliedFilterHint = formatAppliedFilterHint(
+      categories.find((category) => category.id === selectedCategoryId)?.name ??
+        "ALL",
+      sources.find((source) => source.id === selectedSourceId)?.name || "ALL",
+      selectedSpentAtRange.fromInclusive,
+      selectedSpentAtRange.toExclusive,
+    );
   });
 </script>
 
@@ -173,13 +208,14 @@
             id: "spent-at-range",
             title: "Filter by Spent At",
             placeholder: "Spent at",
-            options: dateRangeNameToDateValueMap
-              .keys()
-              .map((key) => ({
-                name: key,
-                value: dateRangeNameToDateValueMap.get(key)!!,
-              }))
-              .toArray(),
+            options:
+              spentAtRangeOptions
+                ?.keys()
+                .map((key) => ({
+                  name: key,
+                  value: spentAtRangeOptions!!.get(key)!!,
+                }))
+                .toArray() ?? [],
           }}
         />
 
@@ -190,6 +226,8 @@
         </div>
       </form>
     </div>
+
+    <p>{@html appliedFilterHint}</p>
 
     {#if spendings.length === 0}
       <div class="empty-state">
@@ -211,7 +249,7 @@
           <tbody>
             {#each spendings as spending (spending.id)}
               <tr>
-                <td>{dayjs(spending.createdAt).formatWithDayAndMonth()}</td>
+                <td>{dayjs(spending.createdAt).format("ddd, DD MMM YYYY")}</td>
                 <td class="description-cell">{spending.description}</td>
                 <td>
                   {#if spending.categoryName === "Primary"}

@@ -9,6 +9,9 @@ export const config = {
       sources: "sources",
       spendings: "spendings",
       spendingSummariesMonthly: "spendings/summaries/months",
+      configs: {
+        latestPayday: "configs/paydays/latest"
+      }
     },
   },
 
