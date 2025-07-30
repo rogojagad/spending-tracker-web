@@ -1,24 +1,40 @@
 <script lang="ts">
-  import { dateRangeNameToDateValueMap } from "$lib/constants";
-  import type { SpendingCreatedAtRange } from "$lib/interfaces";
-  export let selectedSpentAtRange: SpendingCreatedAtRange;
+  import type { DateRange } from "$lib/interfaces";
+
+  interface DateRangeProps {
+    data: DateRangeAttributeProps;
+    value: DateRange;
+  }
+
+  interface DateRangeAttributeProps {
+    id: string;
+    title: string;
+    placeholder: string;
+    options: DateRangeItem[];
+  }
+
+  interface DateRangeItem {
+    value: DateRange;
+    name: string;
+  }
+
+  let { data, value = $bindable() }: DateRangeProps = $props();
+  let isLoading = $derived(data.options.length === 0);
 </script>
 
 <div class="filter-group">
   <h5>Filter By Date Range</h5>
 
   <div>
-    <select
-      placeholder="Spent at"
-      bind:value={selectedSpentAtRange}
-      id="source-select"
-    >
-      {#each Array.from(dateRangeNameToDateValueMap.keys()) as rangeName}
-        <option value={dateRangeNameToDateValueMap.get(rangeName)}
-          >{rangeName}</option
-        >
-      {/each}
-    </select>
+    {#if isLoading}
+      <p>Loading {data.placeholder}</p>
+    {:else}
+      <select placeholder={data.placeholder} bind:value id={data.id}>
+        {#each data.options as option}
+          <option value={option.value}>{option.name}</option>
+        {/each}
+      </select>
+    {/if}
   </div>
 </div>
 

@@ -26,7 +26,7 @@ export interface SpendingSource {
   isActive: boolean;
 }
 
-export interface SpendingCreatedAtRange {
+export interface DateRange {
   fromInclusive: string;
   toExclusive: string;
 }

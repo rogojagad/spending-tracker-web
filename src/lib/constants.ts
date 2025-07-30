@@ -1,10 +1,10 @@
 import dayjs from "dayjs";
-import type { SpendingCreatedAtRange } from "./interfaces";
+import type { DateRange } from "./interfaces";
 
 const todayEndOfDayDateString = dayjs().endOf("day").toISOString();
 export const dateRangeNameToDateValueMap = new Map<
   string,
-  SpendingCreatedAtRange
+  DateRange
 >([
   [
     "Today",

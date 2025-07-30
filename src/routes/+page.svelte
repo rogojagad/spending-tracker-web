@@ -5,7 +5,7 @@
   import type {
     Spending,
     SpendingCategory,
-    SpendingCreatedAtRange,
+    DateRange,
     SpendingFilter,
     SpendingSource,
   } from "$lib/interfaces";
@@ -23,7 +23,7 @@
 
   let selectedCategoryId: string = $state("ALL");
   let selectedSourceId: string = $state("ALL");
-  let selectedSpentAtRange: SpendingCreatedAtRange = $state(
+  let selectedSpentAtRange: DateRange = $state(
     dateRangeNameToDateValueMap.get("Today")!,
   );
 
@@ -167,7 +167,21 @@
           }}
         />
 
-        <DateRangeFilter bind:selectedSpentAtRange />
+        <DateRangeFilter
+          bind:value={selectedSpentAtRange}
+          data={{
+            id: "spent-at-range",
+            title: "Filter by Spent At",
+            placeholder: "Spent at",
+            options: dateRangeNameToDateValueMap
+              .keys()
+              .map((key) => ({
+                name: key,
+                value: dateRangeNameToDateValueMap.get(key)!!,
+              }))
+              .toArray(),
+          }}
+        />
 
         <div class="filter-button">
           <button type="submit" class="btn primary" disabled={isLoading}>
