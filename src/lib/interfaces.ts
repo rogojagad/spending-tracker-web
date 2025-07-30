@@ -50,6 +50,7 @@ export interface Limit {
   sourceName?: string;
   usedValue: number;
   usedPercentage: number;
+  applicationPeriod: string
 }
 
 export interface AuthResponse {

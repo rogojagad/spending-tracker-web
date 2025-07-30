@@ -28,6 +28,7 @@
     {#each limits as limit}
       <div class="card">
         <h3>{limit.name}</h3>
+        <p><strong>Application Period:</strong> {limit.applicationPeriod}</p>
         <p><strong>Limit:</strong> {limit.value.toIDRString()}</p>
         <p>
           <strong>Remaining Limit (Amount):</strong>
