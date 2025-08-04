@@ -2,10 +2,7 @@ import dayjs from "dayjs";
 import type { DateRange } from "./interfaces";
 
 const todayEndOfDayDateString = dayjs().endOf("day").toISOString();
-export const dateRangeNameToDateValueMap = new Map<
-  string,
-  DateRange
->([
+export const dateRangeNameToDateValueMap = new Map<string, DateRange>([
   [
     "Today",
     {
@@ -17,7 +14,7 @@ export const dateRangeNameToDateValueMap = new Map<
     "Yesterday",
     {
       fromInclusive: dayjs().subtract(1, "day").startOf("day").toISOString(),
-      toExclusive: dayjs().startOf("day").toISOString(),
+      toExclusive: dayjs().subtract(1, "day").endOf("day").toISOString(),
     },
   ],
   [
