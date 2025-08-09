@@ -28,7 +28,7 @@
     <div class="dashboard-grid">
       {#each limits as limit}
         <div class="card">
-          <h3>{limit.name}</h3>
+          <h2>{limit.name}</h2>
           <p><strong>Application Period:</strong> {limit.applicationPeriod}</p>
           <p><strong>Limit:</strong> {limit.value.toIDRString()}</p>
           <p>
@@ -56,8 +56,15 @@
 <style>
   .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, minmax(300px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2rem;
+  }
+
+  @media (max-width: 620px) {
+    /* ~ 2*300px + 1rem gap; adjust to your gap */
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
