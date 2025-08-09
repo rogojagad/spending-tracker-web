@@ -136,7 +136,7 @@
     <p class="subtitle">View your spending records</p>
   </section>
 
-  <div class="dashboard-grid">
+  <div>
     <!-- Summary card -->
     <div class="card amount-summary-card">
       <h3>Total Spending</h3>
