@@ -51,6 +51,7 @@ export interface Limit {
   usedValue: number;
   usedPercentage: number;
   applicationPeriod: string
+  descriptionKeywords?: string[]
 }
 
 export interface AuthResponse {

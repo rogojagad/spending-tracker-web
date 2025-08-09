@@ -47,6 +47,10 @@
             <strong>Applied Source:</strong>
             {limit.sourceName ?? "-"}
           </p>
+          <p>
+            <strong>Applied Description Keywords:</strong>
+            {limit.descriptionKeywords?.join(",") ?? "-"}
+          </p>
         </div>
       {/each}
     </div>
