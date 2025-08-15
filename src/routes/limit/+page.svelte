@@ -16,6 +16,11 @@
   <title>My Spending Tracker - Limit</title>
 </svelte:head>
 
+<section class="page-header">
+  <h2>Spending Limit</h2>
+  <p class="subtitle">View your spending limit</p>
+</section>
+
 {#if isLoading}
   <p>Loading data...</p>
 {:else}
