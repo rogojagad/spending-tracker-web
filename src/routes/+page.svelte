@@ -146,24 +146,6 @@
     <!-- Future cards for other statistics could go here -->
   </div>
 
-  <div class="dashboard-grid">
-    <!-- Summary card -->
-    <div class="card amount-primary-card">
-      <h3>Primary</h3>
-      <p>{totalPrimary.toIDRString()}</p>
-    </div>
-    <div class="card amount-secondary-card">
-      <h3>Secondary</h3>
-      <p>{totalSecondary.toIDRString()}</p>
-    </div>
-    <div class="card amount-ternary-card">
-      <h3>Ternary</h3>
-      <p>{totalTernary.toIDRString()}</p>
-    </div>
-
-    <!-- Future cards for other statistics could go here -->
-  </div>
-
   <!-- Spending records table -->
   <div class="card data-table-card">
     <div class="card-header">
