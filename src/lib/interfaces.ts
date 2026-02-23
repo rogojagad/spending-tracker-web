@@ -34,10 +34,12 @@ export interface DateRange {
 export interface MonthSpendingSummary {
   month: Date;
   total: number;
-  summaries: {
-    amount: number;
-    categoryName: string;
-  }[];
+  summaries: SpendingSummary[];
+}
+
+export interface SpendingSummary {
+  amount: number;
+  categoryName: string;
 }
 
 export interface Limit {

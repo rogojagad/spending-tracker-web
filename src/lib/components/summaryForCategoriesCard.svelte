@@ -1,16 +1,21 @@
 <script lang="ts">
-  import { getMonthlySpendingSummaries } from "$lib/api";
-  import type { MonthSpendingSummary } from "$lib/interfaces";
+  import type {
+    MonthSpendingSummary,
+    SpendingCategory,
+    SpendingSummary,
+  } from "$lib/interfaces";
   import dayjs from "dayjs";
   import { onMount } from "svelte";
 
-  let monthlySpendingSummaries: MonthSpendingSummary[] = $state([]);
-  let isLoading = $state(true);
+  interface SummaryTableProps {
+    categories: SpendingCategory[];
+    monthSummaries: MonthSpendingSummary[];
+  }
 
-  onMount(async () => {
-    monthlySpendingSummaries = await getMonthlySpendingSummaries();
-    isLoading = false;
-  });
+  let { categories, monthSummaries }: SummaryTableProps = $props();
+  let isLoading = $derived(
+    monthSummaries.length === 0 || categories.length === 0,
+  );
 </script>
 
 <div class="card data-table-card">
@@ -27,13 +32,14 @@
           <tr>
             <th>Period</th>
             <th>Total</th>
-            <th>Primary</th>
-            <th>Secondary</th>
-            <th>Ternary</th>
+
+            {#each categories as category}
+              <th>{category.name}</th>
+            {/each}
           </tr>
         </thead>
         <tbody>
-          {#each monthlySpendingSummaries as monthSummary}
+          {#each monthSummaries as monthSummary}
             <tr>
               <td>{dayjs(monthSummary.month).formatWithMonthOnly()}</td>
               <td><strong>{monthSummary.total.toIDRString()}</strong></td>
