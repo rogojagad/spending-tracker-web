@@ -8,7 +8,8 @@ export const config = {
       limits: "limits",
       sources: "sources",
       spendings: "spendings",
-      spendingSummariesMonthly: "spendings/summaries/months",
+      monthlySpendingSummary: "spendings/summaries/months",
+      downloadMonthlySpendingSummary: "spendings/summaries/months/csv",
       configs: {
         latestPayday: "configs/paydays/latest"
       }

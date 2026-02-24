@@ -102,7 +102,7 @@ export async function getMonthlySpendingSummaries(): Promise<
     const response = await httpClient
       .get<
         MonthSpendingSummary[]
-      >(config.api.endpoints.spendingSummariesMonthly, { headers: { Authorization: `Bearer ${token}` } })
+      >(config.api.endpoints.monthlySpendingSummary, { headers: { Authorization: `Bearer ${token}` } })
       .json();
 
     return response;
@@ -147,7 +147,19 @@ export async function getLatestPayday(): Promise<Payday> {
       .json();
     return response;
   } catch (error) {
-    console.error(`Failed doing auth ${error}`, error);
+    console.error(`Failed fetching latest payday ${error}`, error);
+    throw error;
+  }
+}
+
+export async function downloadSpendingSummary(): Promise<string> {
+  const { token } = authStore.getToken();
+
+  try {
+    const response = await httpClient.get(config.api.endpoints.downloadMonthlySpendingSummary, { headers: { Authorization: `Bearer ${token}` } }).text();
+    return response;
+  } catch (error) {
+    console.error(`Failed downloading spending summary ${error}`, error);
     throw error;
   }
 }
