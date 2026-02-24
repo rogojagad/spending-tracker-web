@@ -94,4 +94,20 @@
   .download-button {
     margin-bottom: 16px;
   }
+
+  .table-container {
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
+  .data-table {
+    width: 100%;
+  }
+
+  .data-table thead {
+    position: sticky;
+    top: 0;
+    background-color: var(--bg-color, #fff);
+    z-index: 10;
+  }
 </style>
