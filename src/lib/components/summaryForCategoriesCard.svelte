@@ -96,7 +96,7 @@
   }
 
   .table-container {
-    max-height: 500px;
+    max-height: 200px;
     overflow-y: auto;
   }
 
