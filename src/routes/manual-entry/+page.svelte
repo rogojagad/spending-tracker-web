@@ -17,6 +17,7 @@
   let canSubmitById = $state(
     new Map<string, boolean>([[initialInputGroupId, false]]),
   );
+  // TODO: rework this, very nasty state management
   let inputById = $state(
     new Map<string, CreateSpendingInput>([
       [
@@ -26,7 +27,9 @@
     ]),
   );
   let numberOfSpendings = $derived(inputById.entries().toArray().length);
-  let isAllInputGroupsValid = $state(false);
+  let isAllInputGroupsValid = $derived(
+    canSubmitById.entries().every((entry) => entry[1]),
+  );
   let isInitialLoad = $state(true);
   let isSubmittedSuccessfully = $state(false);
 
@@ -61,9 +64,7 @@
 
   async function handleOnSubmit(e: SubmitEvent): Promise<void> {
     e.preventDefault();
-    console.log($state.snapshot(inputById));
     isInitialLoad = false;
-    isAllInputGroupsValid = canSubmitById.entries().every((entry) => entry[1]);
 
     if (isAllInputGroupsValid) {
       const formData = inputById
