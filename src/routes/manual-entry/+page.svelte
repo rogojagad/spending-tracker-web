@@ -7,29 +7,25 @@
   } from "$lib/interfaces";
   import { onMount } from "svelte";
   import ManualEntryInputGroup from "$lib/components/spendingManualEntryInputGroup.svelte";
+  import { keyBy } from "$lib/util/collectionFormatter";
 
   let categories: SpendingCategory[] = $state([]);
   let sources: SpendingSource[] = $state([]);
   let isLoading = $derived(categories.length === 0 || sources.length === 0);
 
   let initialInputGroupId = crypto.randomUUID();
-  let inputGroupIds = $state([initialInputGroupId]);
-  let canSubmitById = $state(
-    new Map<string, boolean>([[initialInputGroupId, false]]),
-  );
-  // TODO: rework this, very nasty state management
-  let inputById = $state(
-    new Map<string, CreateSpendingInput>([
-      [
-        initialInputGroupId,
-        { sourceId: "", categoryId: "", amount: 0, description: "" },
-      ],
+
+  let inputs = $state(
+    new Map<string, { isValid: boolean; input?: CreateSpendingInput }>([
+      [initialInputGroupId, { isValid: false }],
     ]),
   );
-  let numberOfSpendings = $derived(inputById.entries().toArray().length);
-  let isAllInputGroupsValid = $derived(
-    canSubmitById.entries().every((entry) => entry[1]),
+  let inputIds = $derived(inputs.keys().toArray());
+  let spendingsCount = $derived(inputs.entries().toArray().length);
+  let canBeSubmitted = $derived(
+    inputs.entries().every((input) => input[1].isValid),
   );
+
   let isInitialLoad = $state(true);
   let isSubmittedSuccessfully = $state(false);
 
@@ -43,14 +39,16 @@
 
   function onAddNewSpendingClicked(): void {
     const newInputGroupId = crypto.randomUUID();
-    inputGroupIds = [...inputGroupIds, newInputGroupId];
-    canSubmitById.set(newInputGroupId, false);
+    const updated = new Map(inputs);
+    updated.set(newInputGroupId, { isValid: false });
+    inputs = updated;
   }
 
   function onSpendingInputGroupDeleted(deletedId: string): void {
-    inputGroupIds = inputGroupIds.filter((id) => id != deletedId);
-    canSubmitById.delete(deletedId);
-    inputById.delete(deletedId);
+    const updated = new Map(inputs);
+    updated.delete(deletedId);
+
+    inputs = updated;
   }
 
   function onInputChange(
@@ -58,19 +56,21 @@
     isValid: boolean,
     newInput: CreateSpendingInput,
   ): void {
-    canSubmitById.set(id, isValid);
-    inputById.set(id, newInput);
+    const updated = new Map(inputs);
+    updated.set(id, { isValid, input: newInput });
+
+    inputs = updated;
   }
 
   async function handleOnSubmit(e: SubmitEvent): Promise<void> {
     e.preventDefault();
     isInitialLoad = false;
 
-    if (isAllInputGroupsValid) {
-      const formData = inputById
+    if (canBeSubmitted) {
+      const formData = inputs
         .entries()
         .toArray()
-        .map((entry) => entry[1]);
+        .map(([key, value]) => value.input);
 
       await new Promise((res) => {
         isSubmittedSuccessfully = true;
@@ -109,7 +109,7 @@
       </div>
 
       <div class="message-container">
-        {#if !isInitialLoad && !isAllInputGroupsValid}
+        {#if !isInitialLoad && !canBeSubmitted}
           <div class="error-message">
             Some inputs are still invalid, please check again
           </div>
@@ -117,13 +117,13 @@
 
         {#if isSubmittedSuccessfully}
           <div class="success-message">
-            {`${numberOfSpendings} spending(s) created`}
+            {`${spendingsCount} spending(s) created`}
           </div>
         {/if}
       </div>
 
       <div class="input-area">
-        {#each inputGroupIds as id}
+        {#each inputIds as id}
           <ManualEntryInputGroup
             {categories}
             {sources}

@@ -7,6 +7,7 @@
   import DropdownInput from "./formInput/dropdownInput.svelte";
   import AmountInput from "./formInput/amountInput.svelte";
   import ShortTextInput from "./formInput/shortTextInput.svelte";
+  import { untrack } from "svelte";
 
   interface ManualEntryFormProps {
     id: string;
@@ -49,11 +50,16 @@
   }
 
   $effect(() => {
-    onInputsChangeEventHandler(id, isInputsValid, {
+    const currentInput = {
       sourceId: selectedSourceId,
       categoryId: selectedCategoryId,
       description,
       amount,
+    };
+    const currentIsValid = isInputsValid;
+
+    untrack(() => {
+      onInputsChangeEventHandler(id, currentIsValid, currentInput);
     });
   });
 </script>
