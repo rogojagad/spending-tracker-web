@@ -7,7 +7,13 @@
   } from "$lib/interfaces";
   import { onMount } from "svelte";
   import ManualEntryInputGroup from "$lib/components/spendingManualEntryInputGroup.svelte";
-  import { keyBy } from "$lib/util/collectionFormatter";
+
+  const FORM_STATE = Object.freeze({
+    NOT_SUBMITTED: "NOT_SUBMITTED",
+    SUBMITTING: "SUBMITTING",
+    SUBMIT_SUCCESS: "SUBMIT_SUCCESS",
+    SUBMIT_ERROR: "SUBMIT_ERROR",
+  });
 
   let categories: SpendingCategory[] = $state([]);
   let sources: SpendingSource[] = $state([]);
@@ -26,8 +32,7 @@
     inputs.entries().every((input) => input[1].isValid),
   );
 
-  let isInitialLoad = $state(true);
-  let isSubmittedSuccessfully = $state(false);
+  let formState: string = $state(FORM_STATE.NOT_SUBMITTED);
 
   onMount(async () => {
     [sources, categories] = await Promise.all([
@@ -64,7 +69,6 @@
 
   async function handleOnSubmit(e: SubmitEvent): Promise<void> {
     e.preventDefault();
-    isInitialLoad = false;
 
     if (canBeSubmitted) {
       const formData = inputs
@@ -73,7 +77,10 @@
         .map(([key, value]) => value.input);
 
       await new Promise((res) => {
-        isSubmittedSuccessfully = true;
+        formState = FORM_STATE.SUBMIT_SUCCESS;
+        setTimeout(() => {
+          formState = FORM_STATE.NOT_SUBMITTED;
+        }, 3000);
         res(formData);
       });
     }
@@ -109,15 +116,19 @@
       </div>
 
       <div class="message-container">
-        {#if !isInitialLoad && !canBeSubmitted}
-          <div class="error-message">
-            Some inputs are still invalid, please check again
-          </div>
-        {/if}
-
-        {#if isSubmittedSuccessfully}
+        {#if formState === FORM_STATE.SUBMITTING}
+          {#if !canBeSubmitted}
+            <div class="error-message">
+              Some inputs are still invalid, please check again
+            </div>
+          {/if}
+        {:else if formState === FORM_STATE.SUBMIT_SUCCESS}
           <div class="success-message">
             {`${spendingsCount} spending(s) created`}
+          </div>
+        {:else if formState === FORM_STATE.SUBMIT_SUCCESS}
+          <div class="error-message">
+            {`Failed when creating ${spendingsCount} spending(s). Errors: TBA`}
           </div>
         {/if}
       </div>
