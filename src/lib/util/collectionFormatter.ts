@@ -1,1 +1,0 @@
-export const keyBy = (array: any, key: string | number) => (array || []).reduce((r: any, x: { [x: string]: any; }) => ({ ...r, [key ? x[key] : x]: x }), {})

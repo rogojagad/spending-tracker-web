@@ -7,13 +7,8 @@
   } from "$lib/interfaces";
   import { onMount } from "svelte";
   import ManualEntryInputGroup from "$lib/components/spendingManualEntryInputGroup.svelte";
-
-  const FORM_STATE = Object.freeze({
-    NOT_SUBMITTED: "NOT_SUBMITTED",
-    SUBMITTING: "SUBMITTING",
-    SUBMIT_SUCCESS: "SUBMIT_SUCCESS",
-    SUBMIT_ERROR: "SUBMIT_ERROR",
-  });
+  import { FORM_STATE } from "$lib/constants";
+  import FormSubmitMessageContainer from "$lib/components/formSubmitMessageContainer.svelte";
 
   let categories: SpendingCategory[] = $state([]);
   let sources: SpendingSource[] = $state([]);
@@ -115,23 +110,11 @@
         >
       </div>
 
-      <div class="message-container">
-        {#if formState === FORM_STATE.SUBMITTING}
-          {#if !canBeSubmitted}
-            <div class="error-message">
-              Some inputs are still invalid, please check again
-            </div>
-          {/if}
-        {:else if formState === FORM_STATE.SUBMIT_SUCCESS}
-          <div class="success-message">
-            {`${spendingsCount} spending(s) created`}
-          </div>
-        {:else if formState === FORM_STATE.SUBMIT_SUCCESS}
-          <div class="error-message">
-            {`Failed when creating ${spendingsCount} spending(s). Errors: TBA`}
-          </div>
-        {/if}
-      </div>
+      <FormSubmitMessageContainer
+        {spendingsCount}
+        {canBeSubmitted}
+        {formState}
+      />
 
       <div class="input-area">
         {#each inputIds as id}
