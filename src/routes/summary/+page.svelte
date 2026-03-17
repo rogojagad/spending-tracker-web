@@ -2,7 +2,6 @@
   import SummaryForCategoriesCard from "$lib/components/summaryForCategoriesCard.svelte";
   import { getAllCategories, getMonthlySpendingSummaries } from "$lib/api";
   import type { MonthSpendingSummary, SpendingCategory } from "$lib/interfaces";
-  import dayjs from "dayjs";
   import { onMount } from "svelte";
 
   let categories: SpendingCategory[] = $state([]);
@@ -23,19 +22,21 @@
 </svelte:head>
 
 <div class="page-container">
-  {#if isLoading}
-    <div class="loading-overlay">
-      <div class="loading-spinner"></div>
-      <p>Loading data...</p>
-    </div>
-  {/if}
-
   <section class="page-header">
     <h2>Spending Summary</h2>
     <p class="subtitle">View your spending summary</p>
   </section>
 
-  <SummaryForCategoriesCard {categories} monthSummaries={summaries} />
+  <div class="card data-table-card">
+    {#if isLoading}
+      <div class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Loading data...</p>
+      </div>
+    {:else}
+      <SummaryForCategoriesCard {categories} monthSummaries={summaries} />
+    {/if}
+  </div>
 </div>
 
 <style></style>

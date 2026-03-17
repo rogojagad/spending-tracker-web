@@ -117,13 +117,4 @@
     width: 100%;
     margin-top: 1rem;
   }
-
-  .error-message {
-    color: #d32f2f;
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-    padding: 0.5rem;
-    border-radius: 4px;
-    background-color: rgba(211, 47, 47, 0.1);
-  }
 </style>

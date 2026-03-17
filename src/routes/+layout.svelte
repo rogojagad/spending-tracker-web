@@ -40,8 +40,9 @@
             <button class="mobile-menu-btn">☰</button>
             <ul class="nav-links">
               <li><a href="/" class="nav-link">Overview</a></li>
-              <li><a href="/summary" class="nav-link">Summary</a></li>
+              <li><a href="/manual-entry" class="nav-link">Manual Entry</a></li>
               <li><a href="/limit" class="nav-link">Limit</a></li>
+              <li><a href="/summary" class="nav-link">Summary</a></li>
             </ul>
           </nav>
           <button
