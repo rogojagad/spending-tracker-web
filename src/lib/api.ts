@@ -14,6 +14,7 @@ import { authStore } from "./stores/auth";
 
 const httpClient = ky.create({
   prefixUrl: config.api.baseUrl,
+  headers: { 'content-type': 'application/json' },
   retry: {
     limit: 2,
     methods: ["get"],
