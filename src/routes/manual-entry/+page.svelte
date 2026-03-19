@@ -27,7 +27,7 @@
     ]),
   );
   let inputIds = $derived(inputs.keys().toArray());
-  let spendingsCount = $derived(inputs.entries().toArray().length);
+  let spendingsCount = $state(0);
   let canBeSubmitted = $derived(
     inputs.entries().every((input) => input[1].isValid),
   );
@@ -56,10 +56,10 @@
     inputs = updated;
   }
 
-  function onInputChange(
+  function updateInputGroup(
     id: string,
     isValid: boolean,
-    newInput: CreateSpendingInput,
+    newInput?: CreateSpendingInput,
   ): void {
     const updated = new Map(inputs);
     updated.set(id, { isValid, input: newInput });
@@ -78,13 +78,24 @@
 
       try {
         await bulkCreateSpending(formData);
+        spendingsCount = formData.length;
         formState = FORM_STATE.SUBMIT_SUCCESS;
+        clearInputs();
+
+        setTimeout(() => {
+          formState = FORM_STATE.NOT_SUBMITTED;
+          updateInputGroup(crypto.randomUUID(), false);
+        }, 3000);
       } catch (e) {
         const error = e as HTTPError;
         formState = FORM_STATE.SUBMIT_ERROR;
         console.log(error);
       }
     }
+  }
+
+  function clearInputs() {
+    inputs = new Map();
   }
 </script>
 
@@ -128,7 +139,7 @@
             {categories}
             {sources}
             {id}
-            onInputsChangeEventHandler={onInputChange}
+            onInputsChangeEventHandler={updateInputGroup}
             deleteButtonClickedEventHandler={onSpendingInputGroupDeleted}
           />
         {/each}
