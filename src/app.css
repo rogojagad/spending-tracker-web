@@ -201,6 +201,17 @@ a:focus {
   color: white;
 }
 
+.btn.danger {
+  background-color: rgb(238, 63, 63);
+  color: white;
+}
+
+.btn.danger:hover,
+.btn.danger:focus {
+  background-color: rgb(233, 118, 118);
+  color: white;
+}
+
 /* Form elements */
 input,
 select,
@@ -230,18 +241,37 @@ label {
   display: block;
 }
 
-.filter-group {
+.form-input {
   width: 100%;
+  margin-bottom: 1em;
 }
 
-.filter-group h5 {
+.form-input h5 {
   margin: 0 0 0.5rem 0;
   font-size: 0.9rem;
   color: var(--text-secondary);
 }
 
 @media (max-width: 768px) {
-  .filter-group {
+  .form-input {
     margin-bottom: 0.5rem;
   }
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background-color: rgba(211, 47, 47, 0.1);
+}
+
+.success-message {
+  color: #ffffff;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background-color: rgba(84, 192, 51, 0.621);
 }

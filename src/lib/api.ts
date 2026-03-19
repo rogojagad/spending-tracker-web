@@ -2,6 +2,7 @@ import { config } from "$lib/config";
 import ky from "ky";
 import type {
   AuthResponse,
+  CreateSpendingInput,
   Limit,
   MonthSpendingSummary,
   Payday,
@@ -14,6 +15,7 @@ import { authStore } from "./stores/auth";
 
 const httpClient = ky.create({
   prefixUrl: config.api.baseUrl,
+  headers: { 'content-type': 'application/json' },
   retry: {
     limit: 2,
     methods: ["get"],
@@ -160,6 +162,18 @@ export async function downloadSpendingSummary(): Promise<string> {
     return response;
   } catch (error) {
     console.error(`Failed downloading spending summary ${error}`, error);
+    throw error;
+  }
+}
+
+export async function bulkCreateSpending(spendings: CreateSpendingInput[]): Promise<CreateSpendingInput[]> {
+  const { token } = authStore.getToken()
+
+  try {
+    const response = await httpClient.post<CreateSpendingInput[]>(config.api.endpoints.bulkCreateSpendings, { headers: { Authorization: `Bearer ${token}` }, json: spendings }).json()
+    return response
+  } catch (error) {
+    console.error(`Failed bulk creating spendings ${error}`, error);
     throw error;
   }
 }

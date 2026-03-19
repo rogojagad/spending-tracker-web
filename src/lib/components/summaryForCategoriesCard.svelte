@@ -6,9 +6,7 @@
     SpendingCategory,
     SpendingSummary,
   } from "$lib/interfaces";
-  import { authStore } from "$lib/stores/auth";
   import dayjs from "dayjs";
-  import { onMount } from "svelte";
 
   interface SummaryTableProps {
     categories: SpendingCategory[];
@@ -40,48 +38,46 @@
   }
 </script>
 
-<div class="card data-table-card">
-  <div class="card-header">
-    <h3>Monthly Summary For Categories</h3>
+<div class="card-header">
+  <h3>Monthly Summary For Categories</h3>
 
-    <button
-      class="btn primary download-button"
-      onclick={() => {
-        downloadFile();
-      }}>Download as CSV</button
-    >
-  </div>
+  <button
+    class="btn primary download-button"
+    onclick={() => {
+      downloadFile();
+    }}>Download as CSV</button
+  >
+</div>
 
-  <div class="table-container">
-    {#if isLoading}
-      <p>Loading....</p>
-    {:else}
-      <table class="data-table">
-        <thead>
+<div class="table-container">
+  {#if isLoading}
+    <p>Loading....</p>
+  {:else}
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Period</th>
+          <th>Total</th>
+
+          {#each categories as category}
+            <th>{category.name}</th>
+          {/each}
+        </tr>
+      </thead>
+      <tbody>
+        {#each monthSummaries as monthSummary}
           <tr>
-            <th>Period</th>
-            <th>Total</th>
+            <td>{dayjs(monthSummary.month).formatWithMonthOnly()}</td>
+            <td><strong>{monthSummary.total.toIDRString()}</strong></td>
 
-            {#each categories as category}
-              <th>{category.name}</th>
+            {#each monthSummary.summaries as summary}
+              <td>{summary.amount.toIDRString()}</td>
             {/each}
           </tr>
-        </thead>
-        <tbody>
-          {#each monthSummaries as monthSummary}
-            <tr>
-              <td>{dayjs(monthSummary.month).formatWithMonthOnly()}</td>
-              <td><strong>{monthSummary.total.toIDRString()}</strong></td>
-
-              {#each monthSummary.summaries as summary}
-                <td>{summary.amount.toIDRString()}</td>
-              {/each}
-            </tr>
-          {/each}
-        </tbody>
-      </table>
-    {/if}
-  </div>
+        {/each}
+      </tbody>
+    </table>
+  {/if}
 </div>
 
 <style>

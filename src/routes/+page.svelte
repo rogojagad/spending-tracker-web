@@ -10,7 +10,7 @@
     SpendingSource,
     Payday,
   } from "$lib/interfaces";
-  import DateRangeFilter from "$lib/components/dateRangeFilter.svelte";
+  import DateRangeFilter from "$lib/components/formInput/dateRangeInput.svelte";
   import {
     getAllCategories,
     getAllSources,
@@ -20,7 +20,7 @@
 
   import { onMount } from "svelte";
   import { dateRangeNameToDateValueMap } from "$lib/constants";
-  import DropdownFilter from "$lib/components/dropdownFilter.svelte";
+  import DropdownInput from "$lib/components/formInput/dropdownInput.svelte";
   import { formatAppliedFilterHint } from "$lib/util/messageFormatter";
 
   let isLoading = false; // For future filter operations
@@ -158,7 +158,7 @@
           handleFilterSubmitted();
         }}
       >
-        <DropdownFilter
+        <DropdownInput
           bind:value={selectedCategoryId}
           data={{
             placeholder: "Categories",
@@ -170,7 +170,7 @@
           }}
         />
 
-        <DropdownFilter
+        <DropdownInput
           bind:value={selectedSourceId}
           data={{
             placeholder: "Sources",

@@ -7,6 +7,13 @@ export interface Spending {
   sourceName: string;
 }
 
+export interface CreateSpendingInput {
+  amount: number;
+  description: string;
+  categoryId: string;
+  sourceId: string;
+}
+
 export interface SpendingFilter {
   category?: string; // Optional category filter
   source?: string; // Optional category filter
@@ -66,4 +73,12 @@ export interface Payday {
   paydayDate: Date;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface ErrorResponse {
+  code: string
+}
+
+export interface InvalidPayloadErrorResponse extends ErrorResponse {
+  errors: { path: string; message: string; }[]
 }

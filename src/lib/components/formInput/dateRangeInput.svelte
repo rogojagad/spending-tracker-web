@@ -22,7 +22,7 @@
   let isLoading = $derived(data.options.length === 0);
 </script>
 
-<div class="filter-group">
+<div class="form-input">
   <h5>{data.title}</h5>
 
   <div>

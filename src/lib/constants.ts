@@ -46,3 +46,10 @@ export const dateRangeNameToDateValueMap = new Map<string, DateRange>([
     },
   ],
 ]);
+
+export const FORM_STATE = Object.freeze({
+  NOT_SUBMITTED: "NOT_SUBMITTED",
+  SUBMITTING: "SUBMITTING",
+  SUBMIT_SUCCESS: "SUBMIT_SUCCESS",
+  SUBMIT_ERROR: "SUBMIT_ERROR",
+});
