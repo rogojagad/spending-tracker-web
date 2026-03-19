@@ -22,7 +22,7 @@
     <div class="success-message">
       {`${spendingsCount} spending(s) created`}
     </div>
-  {:else if formState === FORM_STATE.SUBMIT_SUCCESS}
+  {:else if formState === FORM_STATE.SUBMIT_ERROR}
     <div class="error-message">
       {`Failed when creating ${spendingsCount} spending(s). Errors: TBA`}
     </div>

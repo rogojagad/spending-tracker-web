@@ -74,3 +74,11 @@ export interface Payday {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface ErrorResponse {
+  code: string
+}
+
+export interface InvalidPayloadErrorResponse extends ErrorResponse {
+  errors: { path: string; message: string; }[]
+}

@@ -8,6 +8,7 @@ export const config = {
       limits: "limits",
       sources: "sources",
       spendings: "spendings",
+      bulkCreateSpendings: "spendings/bulk",
       monthlySpendingSummary: "spendings/summaries/months",
       downloadMonthlySpendingSummary: "spendings/summaries/months/csv",
       configs: {

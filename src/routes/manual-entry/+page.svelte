@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { getAllCategories, getAllSources } from "$lib/api";
+  import {
+    bulkCreateSpending,
+    getAllCategories,
+    getAllSources,
+  } from "$lib/api";
   import type {
     CreateSpendingInput,
     SpendingCategory,
@@ -9,6 +13,7 @@
   import ManualEntryInputGroup from "$lib/components/spendingManualEntryInputGroup.svelte";
   import { FORM_STATE } from "$lib/constants";
   import FormSubmitMessageContainer from "$lib/components/formSubmitMessageContainer.svelte";
+  import type { HTTPError } from "ky";
 
   let categories: SpendingCategory[] = $state([]);
   let sources: SpendingSource[] = $state([]);
@@ -69,15 +74,16 @@
       const formData = inputs
         .entries()
         .toArray()
-        .map(([key, value]) => value.input);
+        .map(([_, value]) => value.input) as CreateSpendingInput[];
 
-      await new Promise((res) => {
+      try {
+        await bulkCreateSpending(formData);
         formState = FORM_STATE.SUBMIT_SUCCESS;
-        setTimeout(() => {
-          formState = FORM_STATE.NOT_SUBMITTED;
-        }, 3000);
-        res(formData);
-      });
+      } catch (e) {
+        const error = e as HTTPError;
+        formState = FORM_STATE.SUBMIT_ERROR;
+        console.log(error);
+      }
     }
   }
 </script>
