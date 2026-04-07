@@ -5,10 +5,15 @@
     canBeSubmitted: boolean;
     formState: string;
     spendingsCount: number;
+    submitErrorDetails: string;
   }
 
-  let { canBeSubmitted, formState, spendingsCount }: MessageContainerProps =
-    $props();
+  let {
+    canBeSubmitted,
+    formState,
+    spendingsCount,
+    submitErrorDetails,
+  }: MessageContainerProps = $props();
 </script>
 
 <div class="message-container">
@@ -24,7 +29,7 @@
     </div>
   {:else if formState === FORM_STATE.SUBMIT_ERROR}
     <div class="error-message">
-      {`Failed when creating ${spendingsCount} spending(s). Errors: TBA`}
+      {`Failed when creating ${spendingsCount} spending(s). Errors: ${submitErrorDetails}`}
     </div>
   {/if}
 </div>

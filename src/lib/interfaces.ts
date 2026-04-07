@@ -75,8 +75,14 @@ export interface Payday {
   updatedAt: Date;
 }
 
+export enum ErrorCode {
+  INVALID_PAYLOAD = "INVALID_PAYLOAD",
+  INVALID_CATEGORY_OR_SOURCE = "INVALID_CATEGORY_OR_SOURCE",
+  INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR",
+}
+
 export interface ErrorResponse {
-  code: string
+  code: ErrorCode
 }
 
 export interface InvalidPayloadErrorResponse extends ErrorResponse {

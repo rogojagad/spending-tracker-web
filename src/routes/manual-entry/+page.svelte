@@ -4,10 +4,13 @@
     getAllCategories,
     getAllSources,
   } from "$lib/api";
-  import type {
-    CreateSpendingInput,
-    SpendingCategory,
-    SpendingSource,
+  import {
+    ErrorCode,
+    type CreateSpendingInput,
+    type ErrorResponse,
+    type InvalidPayloadErrorResponse,
+    type SpendingCategory,
+    type SpendingSource,
   } from "$lib/interfaces";
   import { onMount } from "svelte";
   import ManualEntryInputGroup from "$lib/components/spendingManualEntryInputGroup.svelte";
@@ -33,6 +36,7 @@
   );
 
   let formState: string = $state(FORM_STATE.NOT_SUBMITTED);
+  let submitErrorDetails: string = $state("");
 
   onMount(async () => {
     [sources, categories] = await Promise.all([
@@ -77,8 +81,8 @@
         .map(([_, value]) => value.input) as CreateSpendingInput[];
 
       try {
-        await bulkCreateSpending(formData);
         spendingsCount = formData.length;
+        await bulkCreateSpending(formData);
         formState = FORM_STATE.SUBMIT_SUCCESS;
         clearInputs();
 
@@ -87,9 +91,32 @@
           updateInputGroup(crypto.randomUUID(), false);
         }, 3000);
       } catch (e) {
+        console.log(spendingsCount);
         const error = e as HTTPError;
         formState = FORM_STATE.SUBMIT_ERROR;
-        console.log(error);
+        const errorResponse = await error.response.json<ErrorResponse>();
+
+        switch (errorResponse.code) {
+          case ErrorCode.INVALID_PAYLOAD:
+            submitErrorDetails = (
+              errorResponse as InvalidPayloadErrorResponse
+            ).errors
+              .map((error) => {
+                const fullPath = error.path;
+
+                const itemNo = parseInt(fullPath.split(".")[0]) + 1;
+                const fieldName = fullPath.split(".")[1];
+                const message = error.message;
+
+                return `Item ${itemNo}'s ${fieldName}: ${message}`;
+              })
+              .join(" ; ");
+            return;
+
+          case ErrorCode.INVALID_CATEGORY_OR_SOURCE:
+          case ErrorCode.INTERNAL_SERVER_ERROR:
+          default:
+        }
       }
     }
   }
@@ -131,6 +158,7 @@
         {spendingsCount}
         {canBeSubmitted}
         {formState}
+        {submitErrorDetails}
       />
 
       <div class="input-area">
