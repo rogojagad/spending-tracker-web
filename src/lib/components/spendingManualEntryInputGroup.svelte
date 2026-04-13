@@ -68,6 +68,7 @@
   <AmountInput
     name="amount"
     placeholder="Amount"
+    label="Amount"
     bind:value={amount}
     bind:isInputInvalid={isAmountInvalid}
   />
@@ -75,6 +76,7 @@
   <ShortTextInput
     name="description"
     placeholder="Description"
+    label="Description"
     bind:value={description}
     bind:isInputInvalid={isDescriptionInvalid}
   />

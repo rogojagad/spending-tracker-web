@@ -2,6 +2,7 @@
   interface ShortTextInputProps {
     name: string;
     placeholder: string;
+    label: string;
     value?: string;
     isInputInvalid?: boolean;
   }
@@ -9,13 +10,14 @@
   let {
     name,
     placeholder,
+    label,
     value = $bindable(""),
     isInputInvalid = $bindable(false),
   }: ShortTextInputProps = $props();
 </script>
 
 <div class="form-input">
-  <h5>Amount</h5>
+  <h5>{label}</h5>
   <input
     type="text"
     {name}

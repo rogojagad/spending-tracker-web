@@ -145,15 +145,6 @@
 
   <div class="card">
     <form onsubmit={handleOnSubmit}>
-      <div class="button-area">
-        <button type="submit" class="btn primary"> Save All Spending(s)</button>
-        <button
-          type="button"
-          class="btn secondary"
-          onclick={onAddNewSpendingClicked}>Add New Spending</button
-        >
-      </div>
-
       <FormSubmitMessageContainer
         {spendingsCount}
         {canBeSubmitted}
@@ -171,6 +162,15 @@
             deleteButtonClickedEventHandler={onSpendingInputGroupDeleted}
           />
         {/each}
+      </div>
+
+      <div class="button-area">
+        <button type="submit" class="btn primary"> Save All Spending(s)</button>
+        <button
+          type="button"
+          class="btn secondary"
+          onclick={onAddNewSpendingClicked}>Add New Spending</button
+        >
       </div>
     </form>
   </div>

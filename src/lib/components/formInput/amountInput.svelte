@@ -2,6 +2,7 @@
   interface AmountInputProps {
     name: string;
     placeholder: string;
+    label: string;
     value?: number;
     isInputInvalid?: boolean;
   }
@@ -9,13 +10,14 @@
   let {
     value = $bindable(1),
     isInputInvalid = $bindable(false),
+    label,
     name,
     placeholder,
   }: AmountInputProps = $props();
 </script>
 
 <div class="form-input">
-  <h5>Amount</h5>
+  <h5>{label}</h5>
   <input
     type="number"
     {name}
