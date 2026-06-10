@@ -49,7 +49,7 @@ export const dateRangeNameToDateValueMap = new Map<string, DateRange>([
     "Last Month",
     {
       fromInclusive: dayjs().startOf("month").subtract(1, 'month').startOf('day').toISOString(),
-      toExclusive: todayEndOfDayDateString,
+      toExclusive: dayjs().startOf("month").subtract(1, 'month').endOf('month').endOf('day').toISOString(),
     },
   ],
 ]);
