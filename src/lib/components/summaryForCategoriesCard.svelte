@@ -1,11 +1,6 @@
 <script lang="ts">
-  import { goto } from "$app/navigation";
-  import { auth, downloadSpendingSummary } from "$lib/api";
-  import type {
-    MonthSpendingSummary,
-    SpendingCategory,
-    SpendingSummary,
-  } from "$lib/interfaces";
+  import { downloadSpendingSummary } from "$lib/api";
+  import type { MonthSpendingSummary, SpendingCategory } from "$lib/interfaces";
   import dayjs from "dayjs";
 
   interface SummaryTableProps {
@@ -14,53 +9,71 @@
   }
 
   let { categories, monthSummaries }: SummaryTableProps = $props();
-  let isLoading = $derived(
-    monthSummaries.length === 0 || categories.length === 0,
-  );
+  let isDownloading = $state(false);
+  let downloadMessage = $state("");
+  let downloadError = $state("");
 
   async function downloadFile() {
-    const csvContent = await downloadSpendingSummary();
-    const file = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-
-    // Create a temporary URL for the Blob
-    const url = URL.createObjectURL(file);
-
-    // Create a temporary anchor element, set download attributes, and click it
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "spending-summary.csv");
-    document.body.appendChild(link);
-    link.click();
-
-    // Clean up the temporary URL and element
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    isDownloading = true;
+    downloadMessage = "";
+    downloadError = "";
+    try {
+      const csvContent = await downloadSpendingSummary();
+      const file = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(file);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "spending-summary.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      downloadMessage = "CSV downloaded.";
+      setTimeout(() => (downloadMessage = ""), 3000);
+    } catch {
+      downloadError = "We couldn’t download the CSV. Try again.";
+    } finally {
+      isDownloading = false;
+    }
   }
 </script>
 
 <div class="card-header">
-  <h3>Monthly Summary For Categories</h3>
+  <div>
+    <h2>Monthly breakdown</h2>
+    <p>Totals by category for every available month.</p>
+  </div>
 
   <button
     class="btn primary download-button"
-    onclick={() => {
-      downloadFile();
-    }}>Download as CSV</button
+    disabled={isDownloading}
+    onclick={downloadFile}
+    >{isDownloading ? "Preparing…" : "Download CSV"}</button
   >
 </div>
 
+{#if downloadMessage}
+  <div class="success-message" role="status">{downloadMessage}</div>
+{:else if downloadError}
+  <div class="error-message" role="alert">{downloadError}</div>
+{/if}
+
 <div class="table-container">
-  {#if isLoading}
-    <p>Loading....</p>
+  {#if monthSummaries.length === 0}
+    <div class="empty-state">
+      <h3>No summary yet</h3>
+      <p>Your monthly totals will appear after you add spending.</p>
+    </div>
   {:else}
     <table class="data-table">
+      <caption class="sr-only">Monthly spending totals by category</caption>
       <thead>
         <tr>
-          <th>Period</th>
-          <th>Total</th>
+          <th scope="col">Period</th>
+          <th scope="col">Total</th>
 
           {#each categories as category}
-            <th>{category.name}</th>
+            <th scope="col">{category.name}</th>
           {/each}
         </tr>
       </thead>
@@ -68,10 +81,12 @@
         {#each monthSummaries as monthSummary}
           <tr>
             <td>{dayjs(monthSummary.month).formatWithMonthOnly()}</td>
-            <td><strong>{monthSummary.total.toIDRString()}</strong></td>
+            <td class="amount"
+              ><strong>{monthSummary.total.toIDRString()}</strong></td
+            >
 
             {#each monthSummary.summaries as summary}
-              <td>{summary.amount.toIDRString()}</td>
+              <td class="amount">{summary.amount.toIDRString()}</td>
             {/each}
           </tr>
         {/each}
@@ -83,12 +98,20 @@
 <style>
   .card-header {
     display: grid;
-    grid-template-columns: 2fr auto;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
     align-items: center;
+    margin-bottom: 1.5rem;
   }
 
-  .download-button {
-    margin-bottom: 16px;
+  .card-header h2 {
+    font-size: 1.45rem;
+  }
+
+  .card-header p {
+    margin-top: 0.4rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
   }
 
   .table-container {
@@ -103,7 +126,32 @@
   .data-table thead {
     position: sticky;
     top: 0;
-    background-color: var(--bg-color, #fff);
+    background-color: var(--background-primary);
     z-index: 10;
+  }
+
+  .amount {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .empty-state {
+    padding: 4rem 1rem;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  .empty-state h3 {
+    margin-bottom: 0.5rem;
+  }
+
+  @media (max-width: 600px) {
+    .card-header {
+      grid-template-columns: 1fr;
+    }
+
+    .download-button {
+      width: 100%;
+    }
   }
 </style>

@@ -12,8 +12,7 @@ if (!Number.prototype.toIDRString) {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
-    })
-      .format(this as number);
+    }).format(this as number);
   };
 }
 

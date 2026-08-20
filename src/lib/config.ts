@@ -12,8 +12,8 @@ export const config = {
       monthlySpendingSummary: "spendings/summaries/months",
       downloadMonthlySpendingSummary: "spendings/summaries/months/csv",
       configs: {
-        latestPayday: "configs/paydays/latest"
-      }
+        latestPayday: "configs/paydays/latest",
+      },
     },
   },
 

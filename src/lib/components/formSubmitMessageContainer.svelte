@@ -19,17 +19,19 @@
 <div class="message-container">
   {#if formState === FORM_STATE.SUBMITTING}
     {#if !canBeSubmitted}
-      <div class="error-message">
-        Some inputs are still invalid, please check again
+      <div class="error-message" role="alert">
+        Complete every field before saving.
       </div>
+    {:else}
+      <div class="status-message" role="status">Saving your records…</div>
     {/if}
   {:else if formState === FORM_STATE.SUBMIT_SUCCESS}
-    <div class="success-message">
-      {`${spendingsCount} spending(s) created`}
+    <div class="success-message" role="status">
+      {`${spendingsCount} ${spendingsCount === 1 ? "record" : "records"} saved.`}
     </div>
   {:else if formState === FORM_STATE.SUBMIT_ERROR}
-    <div class="error-message">
-      {`Failed when creating ${spendingsCount} spending(s). Errors: ${submitErrorDetails}`}
+    <div class="error-message" role="alert">
+      {`We couldn’t save ${spendingsCount} ${spendingsCount === 1 ? "record" : "records"}. ${submitErrorDetails}`}
     </div>
   {/if}
 </div>

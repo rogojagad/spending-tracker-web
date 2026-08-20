@@ -15,7 +15,7 @@ import { authStore } from "./stores/auth";
 
 const httpClient = ky.create({
   prefixUrl: config.api.baseUrl,
-  headers: { 'content-type': 'application/json' },
+  headers: { "content-type": "application/json" },
   retry: {
     limit: 2,
     methods: ["get"],
@@ -145,7 +145,9 @@ export async function getLatestPayday(): Promise<Payday> {
   const { token } = authStore.getToken();
   try {
     const response = await httpClient
-      .get<Payday>(config.api.endpoints.configs.latestPayday, { headers: { Authorization: `Bearer ${token}` } })
+      .get<Payday>(config.api.endpoints.configs.latestPayday, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .json();
     return response;
   } catch (error) {
@@ -158,7 +160,11 @@ export async function downloadSpendingSummary(): Promise<string> {
   const { token } = authStore.getToken();
 
   try {
-    const response = await httpClient.get(config.api.endpoints.downloadMonthlySpendingSummary, { headers: { Authorization: `Bearer ${token}` } }).text();
+    const response = await httpClient
+      .get(config.api.endpoints.downloadMonthlySpendingSummary, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .text();
     return response;
   } catch (error) {
     console.error(`Failed downloading spending summary ${error}`, error);
@@ -166,12 +172,18 @@ export async function downloadSpendingSummary(): Promise<string> {
   }
 }
 
-export async function bulkCreateSpending(spendings: CreateSpendingInput[]): Promise<CreateSpendingInput[]> {
-  const { token } = authStore.getToken()
+export async function bulkCreateSpending(
+  spendings: CreateSpendingInput[],
+): Promise<CreateSpendingInput[]> {
+  const { token } = authStore.getToken();
 
   try {
-    const response = await httpClient.post<CreateSpendingInput[]>(config.api.endpoints.bulkCreateSpendings, { headers: { Authorization: `Bearer ${token}` }, json: spendings }).json()
-    return response
+    const response = await httpClient
+      .post<
+        CreateSpendingInput[]
+      >(config.api.endpoints.bulkCreateSpendings, { headers: { Authorization: `Bearer ${token}` }, json: spendings })
+      .json();
+    return response;
   } catch (error) {
     console.error(`Failed bulk creating spendings ${error}`, error);
     throw error;

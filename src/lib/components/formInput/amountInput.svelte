@@ -1,5 +1,6 @@
 <script lang="ts">
   interface AmountInputProps {
+    id: string;
     name: string;
     placeholder: string;
     label: string;
@@ -8,38 +9,43 @@
   }
 
   let {
-    value = $bindable(1),
+    id,
+    value = $bindable(0),
     isInputInvalid = $bindable(false),
     label,
     name,
     placeholder,
   }: AmountInputProps = $props();
+
+  const errorId = `${id}-error`;
+
+  function validate(rawValue: string) {
+    value = Number(rawValue);
+    isInputInvalid = !rawValue || value < 1;
+  }
 </script>
 
 <div class="form-input">
-  <h5>{label}</h5>
+  <label for={id}>{label}</label>
   <input
     type="number"
     {name}
-    id={name}
+    {id}
     {placeholder}
-    class:isInputInvalid
+    min="1"
+    step="1"
+    inputmode="numeric"
+    value={value || ""}
+    aria-invalid={isInputInvalid}
+    aria-describedby={isInputInvalid ? errorId : undefined}
     oninput={(e) => {
-      const eventValue = Number((e.target as HTMLInputElement).value);
-
-      value = eventValue;
-      isInputInvalid = value < 1 ? true : false;
+      validate((e.target as HTMLInputElement).value);
     }}
+    onblur={(e) => validate((e.target as HTMLInputElement).value)}
   />
   {#if isInputInvalid}
-    <small style="color: red;">
-      Invalid input. Value must be greater than 0, current value is {value}
+    <small id={errorId} class="field-error">
+      Enter an amount greater than zero.
     </small>
   {/if}
 </div>
-
-<style>
-  .isInputInvalid {
-    border-color: red;
-  }
-</style>

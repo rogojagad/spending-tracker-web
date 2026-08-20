@@ -21,14 +21,20 @@
   import { onMount } from "svelte";
   import { dateRangeNameToDateValueMap } from "$lib/constants";
   import DropdownInput from "$lib/components/formInput/dropdownInput.svelte";
-  import { formatAppliedFilterHint } from "$lib/util/messageFormatter";
+  import LoadingState from "$lib/components/loadingState.svelte";
 
-  let isLoading = false; // For future filter operations
+  let isLoading = $state(true);
+  let loadError = $state("");
   let spendings: Spending[] = $state([]);
   let sources: SpendingSource[] = $state([]);
   let categories: SpendingCategory[] = $state([]);
   let spentAtRangeOptions: Map<string, DateRange> | undefined = $state();
-  let appliedFilterHint: string = $state("");
+  let appliedFilterHint = $state({
+    category: "All categories",
+    source: "All sources",
+    from: "",
+    to: "",
+  });
 
   let latestPayday: Payday | undefined;
 
@@ -43,35 +49,9 @@
       return prev + next.amount;
     }, 0),
   );
-  const totalPrimary = $derived(
-    spendings
-      .filter((spending) => {
-        return spending.categoryName === "Primary";
-      })
-      .reduce((prev, next) => {
-        return prev + next.amount;
-      }, 0),
-  );
-  const totalSecondary = $derived(
-    spendings
-      .filter((spending) => {
-        return spending.categoryName === "Secondary";
-      })
-      .reduce((prev, next) => {
-        return prev + next.amount;
-      }, 0),
-  );
-  const totalTernary = $derived(
-    spendings
-      .filter((spending) => {
-        return spending.categoryName === "Ternary";
-      })
-      .reduce((prev, next) => {
-        return prev + next.amount;
-      }, 0),
-  );
-
   async function handleFilterSubmitted() {
+    isLoading = true;
+    loadError = "";
     const filterQuery: SpendingFilter = {
       fromInclusive: selectedSpentAtRange.fromInclusive,
       toExclusive: selectedSpentAtRange.toExclusive,
@@ -80,42 +60,54 @@
     if (selectedCategoryId !== "ALL") filterQuery.category = selectedCategoryId;
     if (selectedSourceId !== "ALL") filterQuery.source = selectedSourceId;
 
-    spendings = await getManySpendings(filterQuery);
-
-    appliedFilterHint = formatAppliedFilterHint(
-      categories.find((category) => category.id === selectedCategoryId)?.name ??
-        "ALL",
-      sources.find((source) => source.id === selectedSourceId)?.name || "ALL",
-      selectedSpentAtRange.fromInclusive,
-      selectedSpentAtRange.toExclusive,
-    );
+    try {
+      spendings = await getManySpendings(filterQuery);
+      appliedFilterHint = {
+        category:
+          categories.find((category) => category.id === selectedCategoryId)
+            ?.name ?? "All categories",
+        source:
+          sources.find((source) => source.id === selectedSourceId)?.name ??
+          "All sources",
+        from: dayjs(selectedSpentAtRange.fromInclusive).format("D MMM YYYY"),
+        to: dayjs(selectedSpentAtRange.toExclusive).format("D MMM YYYY"),
+      };
+    } catch {
+      loadError = "We couldn’t update your spending records. Try again.";
+    } finally {
+      isLoading = false;
+    }
   }
 
   onMount(async () => {
-    [spendings, categories, sources, latestPayday] = await Promise.all([
-      getManySpendings({}),
-      getAllCategories(),
-      getAllSources(),
-      getLatestPayday(),
-    ]);
+    try {
+      [spendings, categories, sources, latestPayday] = await Promise.all([
+        getManySpendings({}),
+        getAllCategories(),
+        getAllSources(),
+        getLatestPayday(),
+      ]);
 
-    categories.unshift({ id: "ALL", name: "All Categories", priority: 0 });
-    sources.unshift({ id: "ALL", name: "All Sources", isActive: true });
-    spentAtRangeOptions = dateRangeNameToDateValueMap.set(
-      "This Payday Period",
-      {
-        fromInclusive: dayjs(latestPayday.paydayDate).toISOString(),
-        toExclusive: dayjs().toISOString(),
-      },
-    );
-
-    appliedFilterHint = appliedFilterHint = formatAppliedFilterHint(
-      categories.find((category) => category.id === selectedCategoryId)?.name ??
-        "ALL",
-      sources.find((source) => source.id === selectedSourceId)?.name || "ALL",
-      selectedSpentAtRange.fromInclusive,
-      selectedSpentAtRange.toExclusive,
-    );
+      categories.unshift({ id: "ALL", name: "All Categories", priority: 0 });
+      sources.unshift({ id: "ALL", name: "All Sources", isActive: true });
+      spentAtRangeOptions = new Map(dateRangeNameToDateValueMap);
+      if (latestPayday) {
+        spentAtRangeOptions.set("This Payday Period", {
+          fromInclusive: dayjs(latestPayday.paydayDate).toISOString(),
+          toExclusive: dayjs().toISOString(),
+        });
+      }
+      appliedFilterHint = {
+        category: "All categories",
+        source: "All sources",
+        from: dayjs(selectedSpentAtRange.fromInclusive).format("D MMM YYYY"),
+        to: dayjs(selectedSpentAtRange.toExclusive).format("D MMM YYYY"),
+      };
+    } catch {
+      loadError = "We couldn’t load your spending overview. Try again.";
+    } finally {
+      isLoading = false;
+    }
   });
 </script>
 
@@ -124,32 +116,27 @@
 </svelte:head>
 
 <div class="page-container">
-  {#if isLoading}
-    <div class="loading-overlay">
-      <div class="loading-spinner"></div>
-      <p>Loading data...</p>
-    </div>
-  {/if}
-
   <section class="page-header">
-    <h2>Spending Overview</h2>
-    <p class="subtitle">View your spending records</p>
+    <p class="eyebrow">Overview</p>
+    <h1>Your spending, clearly.</h1>
+    <p class="subtitle">See where your money went and what matters now.</p>
   </section>
 
-  <div>
-    <!-- Summary card -->
-    <div class="card amount-summary-card">
-      <h3>Total Spending</h3>
-      <p>{totalAmount.toIDRString()}</p>
-    </div>
+  {#if loadError}
+    <div class="error-message" role="alert">{loadError}</div>
+  {/if}
 
-    <!-- Future cards for other statistics could go here -->
+  <div class="card amount-summary-card total-card">
+    <span>Total spending</span>
+    <strong>{totalAmount.toIDRString()}</strong>
   </div>
 
-  <!-- Spending records table -->
   <div class="card data-table-card">
     <div class="card-header">
-      <h3>Spending Records</h3>
+      <div>
+        <h2>Records</h2>
+        <p>Filter your latest spending by category, source, or period.</p>
+      </div>
 
       <form
         class="card-actions"
@@ -161,8 +148,9 @@
         <DropdownInput
           bind:value={selectedCategoryId}
           data={{
+            id: "overview-category",
             placeholder: "Categories",
-            title: "Filter by Category",
+            title: "Category",
             options: categories.map((category) => ({
               value: category.id,
               name: category.name,
@@ -173,8 +161,9 @@
         <DropdownInput
           bind:value={selectedSourceId}
           data={{
+            id: "overview-source",
             placeholder: "Sources",
-            title: "Filter by Source",
+            title: "Source",
             options: sources
               .filter((source) => source.isActive)
               .map((source) => ({
@@ -188,52 +177,59 @@
           bind:value={selectedSpentAtRange}
           data={{
             id: "spent-at-range",
-            title: "Filter by Spent At",
+            title: "Period",
             placeholder: "Spent at",
-            options:
-              spentAtRangeOptions
-                ?.keys()
-                .map((key) => ({
-                  name: key,
-                  value: spentAtRangeOptions!!.get(key)!!,
-                }))
-                .toArray() ?? [],
+            options: Array.from(spentAtRangeOptions?.entries() ?? []).map(
+              ([name, value]) => ({ name, value }),
+            ),
           }}
         />
 
         <div class="filter-button">
           <button type="submit" class="btn primary" disabled={isLoading}>
-            {isLoading ? "Filtering..." : "Filter"}</button
+            {isLoading ? "Updating…" : "Apply filters"}</button
           >
         </div>
       </form>
     </div>
 
-    <p>{@html appliedFilterHint}</p>
+    {#if appliedFilterHint.from}
+      <p class="filter-summary">
+        Showing <strong>{appliedFilterHint.category}</strong> from
+        <strong>{appliedFilterHint.source}</strong>, {appliedFilterHint.from}–{appliedFilterHint.to}.
+      </p>
+    {/if}
 
-    {#if spendings.length === 0}
+    {#if isLoading}
+      <LoadingState message="Updating your records…" />
+    {:else if spendings.length === 0}
       <div class="empty-state">
-        <p>No spending records found.</p>
-        <p class="hint">Records you add will appear here.</p>
+        <h3>No records found</h3>
+        <p class="hint">Try another filter or add a new spending record.</p>
       </div>
     {:else}
       <div class="table-container">
         <table class="data-table">
+          <caption class="sr-only">Filtered spending records</caption>
           <thead>
             <tr>
-              <th>Date</th>
-              <th>Description</th>
-              <th>Category</th>
-              <th>Source</th>
-              <th class="amount-column">Amount</th>
+              <th scope="col">Date</th>
+              <th scope="col">Description</th>
+              <th scope="col">Category</th>
+              <th scope="col">Source</th>
+              <th scope="col" class="amount-column">Amount</th>
             </tr>
           </thead>
           <tbody>
             {#each spendings as spending (spending.id)}
               <tr>
-                <td>{dayjs(spending.createdAt).format("ddd, DD MMM YYYY")}</td>
-                <td class="description-cell">{spending.description}</td>
-                <td>
+                <td data-label="Date"
+                  >{dayjs(spending.createdAt).format("D MMM YYYY")}</td
+                >
+                <td data-label="Description" class="description-cell"
+                  >{spending.description}</td
+                >
+                <td data-label="Category">
                   {#if spending.categoryName === "Primary"}
                     <span class="category-badge primary"
                       >{spending.categoryName}</span
@@ -250,8 +246,10 @@
                     <span class="category-badge">{spending.categoryName}</span>
                   {/if}
                 </td>
-                <td>{spending.sourceName}</td>
-                <td class="amount-cell">{spending.amount.toIDRString()}</td>
+                <td data-label="Source">{spending.sourceName}</td>
+                <td data-label="Amount" class="amount-cell"
+                  >{spending.amount.toIDRString()}</td
+                >
               </tr>
             {/each}
           </tbody>
@@ -262,54 +260,85 @@
 </div>
 
 <style>
-  .dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+  .eyebrow {
+    margin-bottom: 0.45rem;
+    color: var(--color-accent);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
 
   .card-actions {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    grid-template-columns: repeat(3, minmax(150px, 1fr)) auto;
+    gap: 0.75rem;
+    align-items: end;
+    margin-top: 1.25rem;
+  }
+
+  /* The shared .form-input spacing lives inside the child inputs, so it has to
+     be cleared globally for the filter row to bottom-align with the button. */
+  .card-actions :global(.form-input) {
+    margin-bottom: 0;
   }
 
   .amount-summary-card {
-    text-align: center;
-    font-size: 2rem;
+    max-width: 420px;
+    min-height: 132px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .amount-summary-card span {
+    color: var(--text-secondary);
+    font-size: 0.83rem;
     font-weight: 600;
   }
 
-  .amount-primary-card {
-    background-color: var(--color-green-light);
-    text-align: center;
-    font-size: 2rem;
-    font-weight: 600;
-    color: var(--color-green-dark);
+  .amount-summary-card strong {
+    font-size: clamp(1.05rem, 2vw, 1.45rem);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
   }
 
-  .amount-secondary-card {
-    text-align: center;
-    font-size: 2rem;
-    font-weight: 600;
-    background-color: var(--color-blue-light);
-    color: var(--color-blue-dark);
+  .total-card {
+    color: white;
+    background: linear-gradient(145deg, #1687f8, #0065cb);
+    border-color: transparent;
+    box-shadow: 0 16px 38px rgba(0, 113, 227, 0.24);
   }
 
-  .amount-ternary-card {
-    text-align: center;
-    font-size: 2rem;
-    font-weight: 600;
-    background-color: #fff3e0;
-    color: #795548;
+  .total-card span {
+    color: rgba(255, 255, 255, 0.76);
+  }
+
+  .total-card strong {
+    color: white;
+    font-size: clamp(1.45rem, 3vw, 2rem);
   }
 
   .card-header {
-    display: flexbox;
-    align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .card-header h2 {
+    font-size: 1.45rem;
+  }
+
+  .card-header > div > p,
+  .filter-summary {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-top: 0.4rem;
+  }
+
+  .filter-summary {
+    padding: 0.8rem 0 1rem;
+    border-bottom: 1px solid var(--border-color);
   }
 
   .amount-column {
@@ -318,8 +347,8 @@
 
   .amount-cell {
     text-align: right;
-    font-family: "Courier New", monospace;
-    font-weight: 500;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
 
   .description-cell {
@@ -339,8 +368,8 @@
 
   /* Primary category (highest urgency) */
   .category-badge.primary {
-    background-color: #e8f5e9;
-    color: #388e3c;
+    background-color: var(--color-success-soft);
+    color: var(--color-success);
   }
 
   /* Secondary category (medium urgency) */
@@ -351,83 +380,95 @@
 
   /* Tertiary category (lowest urgency) */
   .category-badge.tertiary {
-    background-color: #fff3e0;
-    color: #795548;
+    background-color: var(--color-warning-soft);
+    color: var(--color-warning);
   }
 
   .empty-state {
-    padding: 3rem 0;
+    padding: 4rem 1rem;
     text-align: center;
     color: var(--text-hint);
   }
 
   .hint {
     font-size: 0.9rem;
-    opacity: 0.7;
+    margin-top: 0.5rem;
   }
 
-  @media (max-width: 768px) {
-    .dashboard-grid {
-      grid-template-columns: 1fr;
-    }
-
+  @media (max-width: 900px) {
     .card-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin-bottom: 1rem;
+      grid-template-columns: repeat(2, 1fr);
     }
 
     .filter-button {
-      margin-top: 0.5rem;
-      padding-top: 0;
+      grid-column: 2;
     }
 
     .filter-button button {
       width: 100%;
     }
+  }
 
-    .data-table th,
+  @media (max-width: 640px) {
+    .amount-summary-card {
+      max-width: none;
+      min-height: 112px;
+    }
+
+    .card-actions {
+      grid-template-columns: 1fr;
+    }
+
+    .filter-button {
+      grid-column: auto;
+    }
+
+    .data-table thead {
+      display: none;
+    }
+
+    .data-table,
+    .data-table tbody,
+    .data-table tr,
     .data-table td {
-      padding: 0.6rem;
+      display: block;
+      width: 100%;
+    }
+
+    .data-table tr {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .data-table td {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.45rem 0;
+      border: 0;
+      text-align: right;
+      white-space: normal;
+    }
+
+    .data-table td::before {
+      content: attr(data-label);
+      color: var(--text-hint);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-align: left;
     }
 
     .description-cell {
-      max-width: 150px;
-    }
-  }
-
-  .loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(255, 255, 255, 0.8);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-
-  .loading-spinner {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 3px solid var(--color-gray-light);
-    border-top-color: var(--color-blue-dark);
-    animation: spin 1s linear infinite;
-    margin-bottom: 1rem;
-  }
-
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
+      max-width: none;
     }
   }
 
   .filter-button {
-    grid-column-start: -1;
+    align-self: end;
+  }
+
+  /* Match the control height so the button and the selects share a baseline. */
+  .filter-button button {
+    min-height: 46px;
   }
 </style>

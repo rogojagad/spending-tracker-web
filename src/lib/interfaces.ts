@@ -59,8 +59,8 @@ export interface Limit {
   sourceName?: string;
   usedValue: number;
   usedPercentage: number;
-  applicationPeriod: string
-  descriptionKeywords?: string[]
+  applicationPeriod: string;
+  descriptionKeywords?: string[];
 }
 
 export interface AuthResponse {
@@ -82,9 +82,9 @@ export enum ErrorCode {
 }
 
 export interface ErrorResponse {
-  code: ErrorCode
+  code: ErrorCode;
 }
 
 export interface InvalidPayloadErrorResponse extends ErrorResponse {
-  errors: { path: string; message: string; }[]
+  errors: { path: string; message: string }[];
 }

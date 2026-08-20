@@ -26,13 +26,14 @@
   }
 
   .amount-primary {
-    font-size: 16px;
-    font-weight: 700;
-    color: #2d3748;
+    font-size: 0.95rem;
+    font-weight: 650;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
   }
 
   .amount-secondary {
-    font-size: 13px;
-    color: #718096;
+    font-size: 0.75rem;
+    color: var(--text-hint);
   }
 </style>

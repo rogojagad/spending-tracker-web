@@ -1,5 +1,6 @@
 <script lang="ts">
   interface ShortTextInputProps {
+    id: string;
     name: string;
     placeholder: string;
     label: string;
@@ -8,39 +9,39 @@
   }
 
   let {
+    id,
     name,
     placeholder,
     label,
     value = $bindable(""),
     isInputInvalid = $bindable(false),
   }: ShortTextInputProps = $props();
+
+  const errorId = `${id}-error`;
+
+  function validate(newValue: string) {
+    value = newValue;
+    isInputInvalid = value.trim().length === 0;
+  }
 </script>
 
 <div class="form-input">
-  <h5>{label}</h5>
+  <label for={id}>{label}</label>
   <input
     type="text"
     {name}
-    id={name}
+    {id}
     {placeholder}
-    class:isInputInvalid
+    bind:value
+    autocomplete="off"
+    aria-invalid={isInputInvalid}
+    aria-describedby={isInputInvalid ? errorId : undefined}
     oninput={(e) => {
-      const eventValue = (e.target as HTMLInputElement).value;
-
-      value = eventValue;
-      isInputInvalid =
-        value.length === 0 || value.replaceAll(/\s/g, "").length === 0
-          ? true
-          : false;
+      validate((e.target as HTMLInputElement).value);
     }}
+    onblur={(e) => validate((e.target as HTMLInputElement).value)}
   />
   {#if isInputInvalid}
-    <small style="color: red;"> Invalid input. Value cannot be empty. </small>
+    <small id={errorId} class="field-error">Enter a short description.</small>
   {/if}
 </div>
-
-<style>
-  .isInputInvalid {
-    border-color: red;
-  }
-</style>

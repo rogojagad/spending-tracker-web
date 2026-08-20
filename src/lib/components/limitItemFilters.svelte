@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { Limit } from "$lib/interfaces";
-  import { derived } from "svelte/store";
 
   interface LimitFilterProps {
     limit: Limit;
@@ -53,24 +52,21 @@
     font-weight: 500;
     padding: 3px 8px;
     border-radius: 12px;
-    border: 1px solid;
+    border: 1px solid var(--border-color);
   }
 
   .filter-source {
-    background: #e6fffa;
-    color: #234e52;
-    border-color: #b2f5ea;
+    background: var(--color-success-soft);
+    color: #126b28;
   }
 
   .filter-category {
-    background: rgb(230, 255, 163);
-    color: #138b1d;
-    border-color: #c1fe72;
+    background: var(--color-warning-soft);
+    color: var(--color-warning);
   }
 
   .filter-keyword {
-    background: #f0f4ff;
-    color: #3c4fe0;
-    border-color: #a5b4fc;
+    background: var(--color-accent-soft);
+    color: #0057ad;
   }
 </style>
