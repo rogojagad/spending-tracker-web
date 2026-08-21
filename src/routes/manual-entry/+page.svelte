@@ -98,7 +98,12 @@
     formState = FORM_STATE.SUBMITTING;
     submitErrorDetails = "";
 
-    if (!canBeSubmitted) return;
+    if (!canBeSubmitted) {
+      formState = FORM_STATE.SUBMIT_ERROR;
+      submitErrorDetails = "Complete every field before saving.";
+      spendingsCount = inputs.size;
+      return;
+    }
 
     const formData = Array.from(inputs.values()).map(
       (value) => value.input,
@@ -108,8 +113,7 @@
       spendingsCount = formData.length;
       await bulkCreateSpending(formData);
       formState = FORM_STATE.SUBMIT_SUCCESS;
-      clearInputs();
-      updateInputGroup(crypto.randomUUID(), false);
+      resetForm();
 
       setTimeout(() => {
         formState = FORM_STATE.NOT_SUBMITTED;
@@ -122,7 +126,7 @@
 
       switch (errorResponse.code) {
         case ErrorCode.INVALID_PAYLOAD:
-          submitErrorDetails = (
+          submitErrorDetails = `We couldn’t save ${spendingsCount} ${spendingsCount === 1 ? "record" : "records"}. ${(
             errorResponse as InvalidPayloadErrorResponse
           ).errors
             .map((error) => {
@@ -134,18 +138,21 @@
 
               return `Item ${itemNo}'s ${fieldName}: ${message}`;
             })
-            .join(" ; ");
+            .join(" ; ")}`;
           return;
 
         case ErrorCode.INVALID_CATEGORY_OR_SOURCE:
         case ErrorCode.INTERNAL_SERVER_ERROR:
         default:
+          submitErrorDetails = `We couldn’t save ${spendingsCount} ${spendingsCount === 1 ? "record" : "records"}. Please try again.`;
       }
     }
   }
 
-  function clearInputs() {
-    inputs = new Map();
+  function resetForm() {
+    inputs = new Map([[crypto.randomUUID(), { isValid: false }]]);
+    deletedEntry = undefined;
+    if (undoTimeout) clearTimeout(undoTimeout);
   }
 </script>
 
@@ -175,7 +182,7 @@
         />
 
         <div class="input-area">
-          {#each inputIds as id, index}
+          {#each inputIds as id, index (id)}
             <ManualEntryInputGroup
               {categories}
               {sources}

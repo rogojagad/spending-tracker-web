@@ -49,6 +49,8 @@ export interface SpendingSummary {
   categoryName: string;
 }
 
+export type LimitApplicationPeriod = "PAYDAY" | "MONTHLY";
+
 export interface Limit {
   id: string;
   name: string;
@@ -61,6 +63,16 @@ export interface Limit {
   usedPercentage: number;
   applicationPeriod: string;
   descriptionKeywords?: string[];
+}
+
+export interface LimitHistorySnapshot {
+  id: string;
+  name: string;
+  value: number;
+  usedValue: number;
+  usedPercentage: number;
+  snapshotTakenAt: string;
+  applicationPeriod: LimitApplicationPeriod;
 }
 
 export interface AuthResponse {

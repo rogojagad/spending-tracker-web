@@ -31,7 +31,7 @@
     </div>
   {:else if formState === FORM_STATE.SUBMIT_ERROR}
     <div class="error-message" role="alert">
-      {`We couldn’t save ${spendingsCount} ${spendingsCount === 1 ? "record" : "records"}. ${submitErrorDetails}`}
+      {submitErrorDetails}
     </div>
   {/if}
 </div>
