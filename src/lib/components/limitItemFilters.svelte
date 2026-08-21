@@ -1,8 +1,10 @@
 <script lang="ts">
-  import type { Limit } from "$lib/interfaces";
-
   interface LimitFilterProps {
-    limit: Limit;
+    limit: {
+      descriptionKeywords?: string[] | null;
+      sourceName?: string | null;
+      categoryName?: string | null;
+    };
   }
 
   type FilterKey = "descriptionKeywords" | "sourceName" | "categoryName";
@@ -17,10 +19,13 @@
     [
       {
         key: "descriptionKeywords" as FilterKey,
-        value: limit.descriptionKeywords,
+        value: limit.descriptionKeywords ?? undefined,
       },
-      { key: "sourceName" as FilterKey, value: limit.sourceName },
-      { key: "categoryName" as FilterKey, value: limit.categoryName },
+      { key: "sourceName" as FilterKey, value: limit.sourceName ?? undefined },
+      {
+        key: "categoryName" as FilterKey,
+        value: limit.categoryName ?? undefined,
+      },
     ].filter((limitFilter) => !!limitFilter.value),
   );
 </script>

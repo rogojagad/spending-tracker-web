@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { LimitHistorySnapshot } from "$lib/interfaces";
+  import LimitItemFilters from "./limitItemFilters.svelte";
   import LimitStatusIndicator from "./limitStatusIndicator.svelte";
   import "../../types/number";
 
@@ -7,11 +8,10 @@
     snapshot: LimitHistorySnapshot;
   }
 
-  const periodLabel: Record<LimitHistorySnapshot["applicationPeriod"], string> =
-    {
-      PAYDAY: "Payday",
-      MONTHLY: "Monthly",
-    };
+  const periodLabel: Record<string, string> = {
+    PAYDAY: "Payday",
+    MONTHLY: "Monthly",
+  };
 
   let { snapshot }: LimitHistoryItemProps = $props();
   let progress = $derived(Math.min(Math.max(snapshot.usedPercentage, 0), 100));
@@ -21,7 +21,10 @@
 <div class="list-item">
   <div class="item-main">
     <div class="item-title">{snapshot.name}</div>
-    <div class="item-subtitle">{periodLabel[snapshot.applicationPeriod]}</div>
+    <div class="item-subtitle">
+      {periodLabel[snapshot.applicationPeriod] ?? snapshot.applicationPeriod}
+    </div>
+    <LimitItemFilters limit={snapshot} />
   </div>
   <div class="metric">
     <div class="item-amount">

@@ -6,6 +6,7 @@ export const config = {
       auth: "auth",
       categories: "categories",
       limits: "limits",
+      limitSnapshots: "limit-snapshots",
       sources: "sources",
       spendings: "spendings",
       bulkCreateSpendings: "spendings/bulk",

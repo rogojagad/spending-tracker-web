@@ -4,6 +4,7 @@ import type {
   AuthResponse,
   CreateSpendingInput,
   Limit,
+  LimitHistorySnapshot,
   MonthSpendingSummary,
   Payday,
   Spending,
@@ -125,6 +126,21 @@ export async function getSpendingLimits(): Promise<Limit[]> {
     return response;
   } catch (error) {
     console.error(`Failed fetching spending limits ${error}`, error);
+    throw error;
+  }
+}
+
+export async function getLimitSnapshots(): Promise<LimitHistorySnapshot[]> {
+  const { token } = authStore.getToken();
+  try {
+    const response = await httpClient
+      .get<
+        LimitHistorySnapshot[]
+      >(config.api.endpoints.limitSnapshots, { headers: { Authorization: `Bearer ${token}` } })
+      .json();
+    return response;
+  } catch (error) {
+    console.error(`Failed fetching limit snapshots ${error}`, error);
     throw error;
   }
 }

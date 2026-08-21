@@ -71,8 +71,11 @@ export interface LimitHistorySnapshot {
   value: number;
   usedValue: number;
   usedPercentage: number;
-  snapshotTakenAt: string;
+  createdAt: string;
   applicationPeriod: LimitApplicationPeriod;
+  descriptionKeywords?: string[] | null;
+  categoryName?: string | null;
+  sourceName?: string | null;
 }
 
 export interface AuthResponse {

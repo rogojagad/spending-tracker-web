@@ -1,15 +1,14 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
-  import { getSpendingLimits } from "$lib/api";
+  import { getLimitSnapshots, getSpendingLimits } from "$lib/api";
   import LimitHistoryItem from "$lib/components/limitHistoryItem.svelte";
   import LimitItem from "$lib/components/limitItem.svelte";
   import LoadingState from "$lib/components/loadingState.svelte";
   import SegmentedControl from "$lib/components/segmentedControl.svelte";
-  import { placeholderLimitHistory } from "$lib/data/limitHistoryPlaceholder";
   import type { Limit, LimitHistorySnapshot } from "$lib/interfaces";
   import dayjs from "dayjs";
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
 
   type LimitView = "current" | "history";
 
@@ -21,26 +20,46 @@
   let isLoading = $state(true);
   let limits: Limit[] = $state([]);
   let loadError = $state("");
+  let snapshots: LimitHistorySnapshot[] = $state([]);
+  let historyLoading = $state(false);
+  let historyLoaded = $state(false);
+  let historyError = $state("");
   let view = $derived<LimitView>(
     page.url.searchParams.get("view") === "history" ? "history" : "current",
   );
-  let historyGroups = $derived(groupHistoryBySnapshot(placeholderLimitHistory));
+  let historyGroups = $derived(groupHistoryBySnapshot(snapshots));
 
-  function groupHistoryBySnapshot(snapshots: LimitHistorySnapshot[]) {
+  function groupHistoryBySnapshot(items: LimitHistorySnapshot[]) {
     const groups = new Map<string, LimitHistorySnapshot[]>();
 
-    for (const snapshot of snapshots) {
-      const key = dayjs(snapshot.snapshotTakenAt).format("YYYY-MM-DD HH:mm");
+    for (const snapshot of items) {
+      const key = dayjs(snapshot.createdAt).format("YYYY-MM");
       const existing = groups.get(key) ?? [];
       existing.push(snapshot);
       groups.set(key, existing);
     }
 
-    return Array.from(groups.entries()).map(([takenAt, items]) => ({
+    return Array.from(groups.entries()).map(([takenAt, groupItems]) => ({
       takenAt,
-      label: dayjs(items[0].snapshotTakenAt).format("D MMM YYYY, HH:mm"),
-      items,
+      label: dayjs(groupItems[0].createdAt).format("MMM YYYY"),
+      items: groupItems,
     }));
+  }
+
+  async function loadHistory() {
+    if (historyLoading || historyLoaded) return;
+
+    historyLoading = true;
+    historyError = "";
+
+    try {
+      snapshots = await getLimitSnapshots();
+      historyLoaded = true;
+    } catch {
+      historyError = "We couldn’t load your limit history. Try again.";
+    } finally {
+      historyLoading = false;
+    }
   }
 
   onMount(async () => {
@@ -50,6 +69,14 @@
       loadError = "We couldn’t load your limits. Try again.";
     } finally {
       isLoading = false;
+    }
+  });
+
+  $effect(() => {
+    if (view === "history") {
+      untrack(() => {
+        void loadHistory();
+      });
     }
   });
 
@@ -97,6 +124,10 @@
     <div class="error-message" role="alert">{loadError}</div>
   {/if}
 
+  {#if historyError && view === "history"}
+    <div class="error-message" role="alert">{historyError}</div>
+  {/if}
+
   {#if view === "current"}
     <div
       id="limits-current-panel"
@@ -124,14 +155,27 @@
       role="tabpanel"
       aria-labelledby="limits-view-tab-history"
     >
-      {#each historyGroups as group (group.takenAt)}
-        <section class="card compact-list">
-          <h2 class="snapshot-heading">Snapshot {group.label}</h2>
-          {#each group.items as snapshot (snapshot.id)}
-            <LimitHistoryItem {snapshot} />
-          {/each}
-        </section>
-      {/each}
+      {#if historyLoading}
+        <div class="card compact-list">
+          <LoadingState message="Loading your limit history…" />
+        </div>
+      {:else if snapshots.length === 0}
+        <div class="card compact-list">
+          <div class="empty-state">
+            <h2>No snapshots yet</h2>
+            <p>Past limit usage will appear here after the next snapshot.</p>
+          </div>
+        </div>
+      {:else}
+        {#each historyGroups as group (group.takenAt)}
+          <section class="card compact-list">
+            <h2 class="snapshot-heading">{group.label}</h2>
+            {#each group.items as snapshot (snapshot.id)}
+              <LimitHistoryItem {snapshot} />
+            {/each}
+          </section>
+        {/each}
+      {/if}
     </div>
   {/if}
 </div>
