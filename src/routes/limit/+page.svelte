@@ -7,7 +7,10 @@
   import LoadingState from "$lib/components/loadingState.svelte";
   import SegmentedControl from "$lib/components/segmentedControl.svelte";
   import type { Limit, LimitHistorySnapshot } from "$lib/interfaces";
-  import dayjs from "dayjs";
+  import {
+    formatJakartaMonthKey,
+    formatJakartaMonthLabel,
+  } from "$lib/util/jakartaDate";
   import { onMount, untrack } from "svelte";
 
   type LimitView = "current" | "history";
@@ -33,7 +36,7 @@
     const groups = new Map<string, LimitHistorySnapshot[]>();
 
     for (const snapshot of items) {
-      const key = dayjs(snapshot.createdAt).format("YYYY-MM");
+      const key = formatJakartaMonthKey(snapshot.createdAt);
       const existing = groups.get(key) ?? [];
       existing.push(snapshot);
       groups.set(key, existing);
@@ -41,7 +44,7 @@
 
     return Array.from(groups.entries()).map(([takenAt, groupItems]) => ({
       takenAt,
-      label: dayjs(groupItems[0].createdAt).format("MMM YYYY"),
+      label: formatJakartaMonthLabel(groupItems[0].createdAt),
       items: groupItems,
     }));
   }

@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { LimitHistorySnapshot } from "$lib/interfaces";
+  import { formatJakartaDay } from "$lib/util/jakartaDate";
   import LimitItemFilters from "./limitItemFilters.svelte";
   import LimitStatusIndicator from "./limitStatusIndicator.svelte";
   import "../../types/number";
@@ -23,27 +24,28 @@
     <div class="item-title">{snapshot.name}</div>
     <div class="item-subtitle">
       {periodLabel[snapshot.applicationPeriod] ?? snapshot.applicationPeriod}
+      · {formatJakartaDay(snapshot.createdAt)}
     </div>
     <LimitItemFilters limit={snapshot} />
   </div>
   <div class="metric">
     <div class="item-amount">
-      <div class="amount-primary">{snapshot.value.toIDRString()}</div>
       <div class="amount-secondary">Limit</div>
+      <div class="amount-primary">{snapshot.value.toIDRString()}</div>
     </div>
   </div>
   <div class="metric remaining">
     <div class="item-amount">
-      <div class="amount-primary">{remaining.toIDRString()}</div>
       <div class="amount-secondary">Remaining</div>
+      <div class="amount-primary">{remaining.toIDRString()}</div>
     </div>
   </div>
   <div class="metric">
     <div class="item-amount">
-      <div class="amount-primary">{snapshot.usedValue.toIDRString()}</div>
       <div class="amount-secondary">
         Used ({snapshot.usedPercentage.toFixed(2)}%)
       </div>
+      <div class="amount-primary">{snapshot.usedValue.toIDRString()}</div>
     </div>
   </div>
   <div class="status">
@@ -90,6 +92,8 @@
   }
 
   .item-amount {
+    display: flex;
+    flex-direction: column-reverse;
     text-align: right;
   }
 
@@ -124,18 +128,14 @@
 
   @media (max-width: 900px) {
     .list-item {
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem 0.75rem;
+      grid-template-columns: 1fr;
+      gap: 0.55rem;
       padding: 1.25rem 1.15rem 1.6rem;
-    }
-
-    .item-main,
-    .status {
-      grid-column: 1 / -1;
     }
 
     .status {
       justify-self: start;
+      padding-top: 0.25rem;
     }
 
     .metric {
@@ -144,20 +144,25 @@
       background: var(--color-gray-light);
     }
 
+    .item-amount {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.75rem;
+      text-align: unset;
+    }
+
+    .amount-secondary {
+      text-align: left;
+    }
+
+    .amount-primary {
+      text-align: right;
+    }
+
     .progress-track {
       right: 1.15rem;
       left: 1.15rem;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .list-item {
-      grid-template-columns: 1fr;
-    }
-
-    .item-main,
-    .status {
-      grid-column: auto;
     }
   }
 </style>
