@@ -14,7 +14,7 @@
   import {
     getAllCategories,
     getAllSources,
-    getLatestPayday,
+    getYearlyPaydays,
     getManySpendings,
   } from "$lib/api";
 
@@ -36,7 +36,55 @@
     to: "",
   });
 
-  let latestPayday: Payday | undefined;
+  function computePaydayPeriods(paydays: Payday[]): {
+    thisPeriod: DateRange | undefined;
+    previousPeriod: DateRange | undefined;
+  } {
+    const now = dayjs();
+    const sorted = [...paydays].sort(
+      (a, b) => dayjs(a.paydayDate).valueOf() - dayjs(b.paydayDate).valueOf(),
+    );
+
+    let currentIndex = -1;
+    for (let i = 0; i < sorted.length - 1; i++) {
+      if (
+        !now.isBefore(dayjs(sorted[i].paydayDate)) &&
+        now.isBefore(dayjs(sorted[i + 1].paydayDate))
+      ) {
+        currentIndex = i;
+        break;
+      }
+    }
+
+    // Fallback: today is on or after the last payday in the list
+    if (
+      currentIndex === -1 &&
+      sorted.length > 0 &&
+      !now.isBefore(dayjs(sorted[sorted.length - 1].paydayDate))
+    ) {
+      currentIndex = sorted.length - 1;
+    }
+
+    if (currentIndex === -1) return { thisPeriod: undefined, previousPeriod: undefined };
+
+    const thisPeriod: DateRange = {
+      fromInclusive: dayjs(sorted[currentIndex].paydayDate).toISOString(),
+      toExclusive:
+        currentIndex + 1 < sorted.length
+          ? dayjs(sorted[currentIndex + 1].paydayDate).toISOString()
+          : now.toISOString(),
+    };
+
+    const previousPeriod: DateRange | undefined =
+      currentIndex > 0
+        ? {
+            fromInclusive: dayjs(sorted[currentIndex - 1].paydayDate).toISOString(),
+            toExclusive: dayjs(sorted[currentIndex].paydayDate).toISOString(),
+          }
+        : undefined;
+
+    return { thisPeriod, previousPeriod };
+  }
 
   let selectedCategoryId: string = $state("ALL");
   let selectedSourceId: string = $state("ALL");
@@ -81,21 +129,28 @@
 
   onMount(async () => {
     try {
-      [spendings, categories, sources, latestPayday] = await Promise.all([
-        getManySpendings({}),
-        getAllCategories(),
-        getAllSources(),
-        getLatestPayday(),
-      ]);
+      const [fetchedSpendings, fetchedCategories, fetchedSources, yearlyPaydays] =
+        await Promise.all([
+          getManySpendings({}),
+          getAllCategories(),
+          getAllSources(),
+          getYearlyPaydays(),
+        ]);
+
+      spendings = fetchedSpendings;
+      categories = fetchedCategories;
+      sources = fetchedSources;
 
       categories.unshift({ id: "ALL", name: "All Categories", priority: 0 });
       sources.unshift({ id: "ALL", name: "All Sources", isActive: true });
       spentAtRangeOptions = new Map(dateRangeNameToDateValueMap);
-      if (latestPayday) {
-        spentAtRangeOptions.set("This Payday Period", {
-          fromInclusive: dayjs(latestPayday.paydayDate).toISOString(),
-          toExclusive: dayjs().toISOString(),
-        });
+
+      const { thisPeriod, previousPeriod } = computePaydayPeriods(yearlyPaydays);
+      if (thisPeriod) {
+        spentAtRangeOptions.set("This Payday Period", thisPeriod);
+      }
+      if (previousPeriod) {
+        spentAtRangeOptions.set("Previous Payday Period", previousPeriod);
       }
       appliedFilterHint = {
         category: "All categories",

@@ -14,6 +14,7 @@ export const config = {
       downloadMonthlySpendingSummary: "spendings/summaries/months/csv",
       configs: {
         latestPayday: "configs/paydays/latest",
+        yearlyPaydays: "configs/paydays/yearly",
       },
     },
   },

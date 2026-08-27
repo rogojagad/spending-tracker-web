@@ -45,22 +45,6 @@ export const dateRangeNameToDateValueMap = new Map<string, DateRange>([
       toExclusive: todayEndOfDayDateString,
     },
   ],
-  [
-    "Last Month",
-    {
-      fromInclusive: dayjs()
-        .startOf("month")
-        .subtract(1, "month")
-        .startOf("day")
-        .toISOString(),
-      toExclusive: dayjs()
-        .startOf("month")
-        .subtract(1, "month")
-        .endOf("month")
-        .endOf("day")
-        .toISOString(),
-    },
-  ],
 ]);
 
 export const FORM_STATE = Object.freeze({

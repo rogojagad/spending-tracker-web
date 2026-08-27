@@ -172,6 +172,21 @@ export async function getLatestPayday(): Promise<Payday> {
   }
 }
 
+export async function getYearlyPaydays(): Promise<Payday[]> {
+  const { token } = authStore.getToken();
+  try {
+    const response = await httpClient
+      .get<Payday[]>(config.api.endpoints.configs.yearlyPaydays, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .json();
+    return response;
+  } catch (error) {
+    console.error(`Failed fetching yearly paydays ${error}`, error);
+    throw error;
+  }
+}
+
 export async function downloadSpendingSummary(): Promise<string> {
   const { token } = authStore.getToken();
 
