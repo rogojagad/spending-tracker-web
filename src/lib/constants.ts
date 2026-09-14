@@ -1,15 +1,15 @@
 import dayjs from "dayjs";
 import type { DateRange } from "./interfaces";
 
-const todayEndOfDayDateString = dayjs().endOf("day").toISOString();
 const dateRangeValueFormat = "YYYY-MM-DD"
+const tomorrowDate = dayjs().add(1, 'day').format(dateRangeValueFormat)
 
 export const dateRangeNameToDateValueMap = new Map<string, DateRange>([
   [
     "Today",
     {
       fromInclusive: dayjs().format(dateRangeValueFormat),
-      toExclusive: todayEndOfDayDateString,
+      toExclusive: tomorrowDate,
     },
   ],
   [
@@ -23,28 +23,28 @@ export const dateRangeNameToDateValueMap = new Map<string, DateRange>([
     "Last 3 Days",
     {
       fromInclusive: dayjs().subtract(2, "day").format(dateRangeValueFormat),
-      toExclusive: todayEndOfDayDateString,
+      toExclusive: tomorrowDate,
     },
   ],
   [
     "Last 7 Days",
     {
       fromInclusive: dayjs().subtract(6, "day").format(dateRangeValueFormat),
-      toExclusive: todayEndOfDayDateString,
+      toExclusive: tomorrowDate,
     },
   ],
   [
     "This Week",
     {
       fromInclusive: dayjs().startOf("week").format(dateRangeValueFormat),
-      toExclusive: todayEndOfDayDateString,
+      toExclusive: tomorrowDate,
     },
   ],
   [
     "This Month",
     {
       fromInclusive: dayjs().startOf("month").format(dateRangeValueFormat),
-      toExclusive: todayEndOfDayDateString,
+      toExclusive: tomorrowDate,
     },
   ],
 ]);
