@@ -16,7 +16,7 @@ export const dateRangeNameToDateValueMap = new Map<string, DateRange>([
     "Yesterday",
     {
       fromInclusive: dayjs().subtract(1, "day").format(dateRangeValueFormat),
-      toExclusive: dayjs().subtract(1, "day").endOf("day").toISOString(),
+      toExclusive: dayjs().subtract(1, "day").endOf("day").format(dateRangeValueFormat),
     },
   ],
   [
